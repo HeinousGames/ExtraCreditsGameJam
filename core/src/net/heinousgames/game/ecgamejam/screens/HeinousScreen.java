@@ -45,7 +45,7 @@ public class HeinousScreen implements Screen, InputProcessor {
     public Rectangle characterRect;
     //public Circle characterCircle;
     public ShapeRenderer debugRenderer;
-    public TextureRegion currentFrame;
+    public TextureRegion currentFrame, nonMovingFrame;
     public TiledMap map;
 
     public int currentCheckpointIndex;
@@ -80,6 +80,7 @@ public class HeinousScreen implements Screen, InputProcessor {
         characterWalking = new Animation<TextureRegion>(0.1f, regions[0][0], regions[0][1],
                 regions[0][2], regions[0][3], regions[0][4], regions[0][5], regions[0][6], regions[0][7]);
         characterWalking.setPlayMode(Animation.PlayMode.LOOP);
+        nonMovingFrame = regions[0][0];
 
         //characterX = 11;
         //characterY = 4;
@@ -251,7 +252,27 @@ public class HeinousScreen implements Screen, InputProcessor {
 //        for (CheckPoint checkPoint : checkPoints) {
 //            checkPoint.draw(main.batch, 1);
 //        }
-        main.batch.draw(currentFrame, characterRect.x, characterRect.y, characterRect.width, characterRect.height);
+        if (goingUp) {
+            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 0);
+        } else if (goingDown) {
+            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 180);
+        } else if (goingLeft) {
+            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 270);
+        } else if (goingRight) {
+            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 90);
+        } else {
+            main.batch.draw(nonMovingFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 0);
+        }
         main.batch.end();
 
 //        for (int i = 0; i < currentCheckpointIndex; i++) {
