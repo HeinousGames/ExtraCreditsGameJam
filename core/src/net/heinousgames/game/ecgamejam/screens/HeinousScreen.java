@@ -17,7 +17,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -28,8 +30,8 @@ public class HeinousScreen implements Screen, InputProcessor {
 
     public Animation<TextureRegion> characterWalking;
     public Array<Rectangle> tiles;
-    public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing;
-    private float bgAlpha, wallLayerAlpha, characterX, characterY, stateTime;
+    public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing, upMemory, downMemory, leftMemory, rightMemory;
+    private float bgAlpha, wallLayerAlpha, stateTime;
     private Image bg;
     private int worldWidth, worldHeight;
     public Main main;
@@ -37,9 +39,11 @@ public class HeinousScreen implements Screen, InputProcessor {
     public OrthogonalTiledMapRenderer renderer;
     public Pool<Rectangle> rectPool;
     public Rectangle characterRect;
+    //public Circle characterCircle;
     public ShapeRenderer debugRenderer;
     public TextureRegion currentFrame;
     public TiledMap map;
+    private float movementSpeed = .07f;
 
     public HeinousScreen(Main main, String mapFileName) {
         this.main = main;
@@ -71,10 +75,12 @@ public class HeinousScreen implements Screen, InputProcessor {
                 regions[0][2], regions[0][3], regions[0][4], regions[0][5], regions[0][6], regions[0][7]);
         characterWalking.setPlayMode(Animation.PlayMode.LOOP);
 
-        characterX = 11;
-        characterY = 4;
+        //characterX = 11;
+        //characterY = 4;
 
-        characterRect = new Rectangle(characterX, characterY, 1, 1);
+        //characterRect = new Rectangle(characterX, characterY, 1, 1);
+        characterRect = new Rectangle(11, 4, (7/16f), (7/16f));
+        //characterCircle = new Circle(11, 4, (5/16f));
 
         rectPool = new Pool<Rectangle>() {
             @Override
@@ -130,62 +136,95 @@ public class HeinousScreen implements Screen, InputProcessor {
         renderer.getMap().getLayers().get("walls").setOpacity(wallLayerAlpha);
         renderer.render();
 
+        Vector2 velocity = new Vector2();
+
         if (goingLeft) {
-            characterX -= 0.07f;
+            velocity.x -= movementSpeed;
         }
 
         if (goingRight) {
-            characterX += 0.07f;
+            velocity.x += movementSpeed;
         }
 
         if (goingDown) {
-            characterY -= 0.07f;
+            velocity.y -= movementSpeed;
         }
 
         if (goingUp) {
-            characterY += 0.07f;
+            velocity.y += movementSpeed;
         }
 
+        Rectangle huskyRect = new Rectangle(characterRect);
         int startX, startY, endX, endY;
-        startX = (int) characterRect.x;
-        endX = (int) characterRect.x + 1;
-        startY = (int) characterRect.y;
-        endY = (int) characterRect.y + 1;
+        if (velocity.x > 0) {
+            startX = endX = (int) (huskyRect.x + huskyRect.getWidth() + velocity.x);
+        } else {
+            startX = endX = (int) (huskyRect.x + velocity.x);
+        }
+        startY = (int) (huskyRect.y);
+        endY = (int) (huskyRect.y + huskyRect.getHeight());
+        huskyRect.x += velocity.x;
+        float velocityXplaceHolder = velocity.x;
+
+        // check regular walls
         getTiles(startX, startY, endX, endY, tiles, "walls", rectPool);
         for (Rectangle tile : tiles) {
-            if (characterRect.overlaps(tile)) {
-                if (goingUp) {
-                    characterY = tile.y - 1;
-                }
-
-                if (goingDown) {
-                    characterY = tile.y + 1;
-                }
-
-                if (goingRight) {
-                    characterX = tile.x - 1;
-                }
-
-                if (goingLeft) {
-                    characterX = tile.x + 1;
-                }
+            if (huskyRect.overlaps(tile)) {
+                velocity.x = 0;
                 break;
             }
         }
 
-        characterRect.x = characterX;
-        characterRect.y = characterY;
+
+        if (velocity.x == 0) {
+            huskyRect.x -= velocityXplaceHolder;
+        }
+
+        // if the dog is moving upwards, check the tiles to the top of its
+        // top bounding box edge, otherwise check the ones to the bottom
+        if (velocity.y > 0) {
+            startY = endY = (int) (huskyRect.y + huskyRect.getHeight() + velocity.y);
+        } else {
+            startY = endY = (int) (huskyRect.y + velocity.y);
+        }
+        startX = (int) (huskyRect.x);
+        endX = (int) (huskyRect.x + huskyRect.getWidth());
+        huskyRect.y += velocity.y;
+        float velocityYplaceHolder = velocity.y;
+
+        // check regular walls
+        getTiles(startX, startY, endX, endY, tiles, "walls", rectPool);
+        for (Rectangle tile : tiles) {
+            if (huskyRect.overlaps(tile)) {
+                // we actually reset the husky y-position here
+                // so it is just below/above the tile we collided with
+                // this removes bouncing :)
+                if (velocity.y > 0) {
+                    characterRect.y = tile.y - huskyRect.getHeight();
+                } else {
+                    characterRect.y = tile.y + tile.height;
+                }
+                velocity.y = 0;
+                break;
+            }
+        }
+
+
+        characterRect.x += velocity.x;
+        characterRect.y += velocity.y;
+
+
 
         stateTime += delta;
         currentFrame = characterWalking.getKeyFrame(stateTime);
         main.batch.setColor(main.batch.getColor().r, main.batch.getColor().g, main.batch.getColor().b, 1);
         main.batch.begin();
-        main.batch.draw(currentFrame, characterRect.x, characterRect.y, 1, 1);
-        main.batch.end();
+        main.batch.draw(currentFrame, characterRect.x, characterRect.y, characterRect.width, characterRect.height);
+         main.batch.end();
 
         renderDebug();
 
-        getTiles(startX, startY, endX, endY, tiles, "walls", rectPool);
+        //getTiles(startX, startY, endX, endY, tiles, "walls", rectPool);
         for (Rectangle tile : tiles) {
             debugRenderer.rect(tile.x, tile.y, tile.width, tile.height);
         }
@@ -198,7 +237,6 @@ public class HeinousScreen implements Screen, InputProcessor {
 
         debugRenderer.setColor(Color.RED);
         debugRenderer.rect(characterRect.x, characterRect.y, characterRect.width, characterRect.height);
-
 //        getTiles(0, 0, worldWidth, worldHeight, tiles, "walls", rectPool);
 //        for (Rectangle tile : tiles) {
 //            debugRenderer.rect(tile.x, tile.y, tile.width, tile.height);
