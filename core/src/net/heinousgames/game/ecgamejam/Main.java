@@ -22,7 +22,6 @@ public class Main extends Game {
         mapLoader = new TmxMapLoader();
         preferences = Gdx.app.getPreferences("ExtraCreditsGameJamSave");
         setScreen(new HeinousScreen(this, "tiger.tmx"));
-		batch = new SpriteBatch();
 	}
 
 	@Override
