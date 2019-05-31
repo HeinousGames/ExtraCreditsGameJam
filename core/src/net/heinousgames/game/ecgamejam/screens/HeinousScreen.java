@@ -17,20 +17,24 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
+import net.heinousgames.game.ecgamejam.CheckPoint;
 import net.heinousgames.game.ecgamejam.Main;
 
 public class HeinousScreen implements Screen, InputProcessor {
 
+    private static final float PATH_BUFFER_DISTANCE = 8;
+    private static final float MOVEMENT_SPEED = .07f;
+
     public Animation<TextureRegion> characterWalking;
     public Array<Rectangle> tiles;
-    public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing, upMemory, downMemory, leftMemory, rightMemory;
+    public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing,
+            upMemory, downMemory, leftMemory, rightMemory;
     private float bgAlpha, wallLayerAlpha, stateTime;
     private Image bg;
     private int worldWidth, worldHeight;
@@ -43,7 +47,9 @@ public class HeinousScreen implements Screen, InputProcessor {
     public ShapeRenderer debugRenderer;
     public TextureRegion currentFrame;
     public TiledMap map;
-    private float movementSpeed = .07f;
+
+    public int currentCheckpointIndex;
+    public Array<CheckPoint> checkPoints;
 
     public HeinousScreen(Main main, String mapFileName) {
         this.main = main;
@@ -62,7 +68,7 @@ public class HeinousScreen implements Screen, InputProcessor {
 
         for (MapLayer layer : map.getLayers()) {
             for (MapObject object : layer.getObjects()) {
-                if (object.getName().equals("bg")) {
+                if (object.getName() != null && object.getName().equals("bg")) {
                     bg = new Image(((TiledMapTileMapObject) object).getTile().getTextureRegion());
                     bg.setSize(worldWidth, worldHeight);
                 }
@@ -94,6 +100,27 @@ public class HeinousScreen implements Screen, InputProcessor {
         main.bgMusic.setLooping(true);
 
         Gdx.input.setInputProcessor(this);
+
+        currentCheckpointIndex = 0;
+
+        for (MapLayer layer : map.getLayers()) {
+            if (layer.getName().equals("checkpoints")) {
+                int count = layer.getObjects().getCount();
+                checkPoints = new Array<CheckPoint>(count);
+                checkPoints.size = count;
+                for (MapObject mapObject : layer.getObjects()) {
+                    TextureRegion textureRegion = ((TiledMapTileMapObject) mapObject).getTextureRegion();
+                    float x = ((TiledMapTileMapObject) mapObject).getX();
+                    float y = ((TiledMapTileMapObject) mapObject).getY();
+                    int position = mapObject.getProperties().get("position", Integer.class);
+                    checkPoints.set(position, new CheckPoint(textureRegion, x/32f, y/32f));
+                }
+            }
+        }
+
+//        for (int i = 0; i < checkPoints.size; i++) {
+//            System.out.println("Position: " + i + "\nX: " + checkPoints.get(i).getX() + "\nY: " + checkPoints.get(i).getY());
+//        }
     }
 
     @Override
@@ -139,19 +166,19 @@ public class HeinousScreen implements Screen, InputProcessor {
         Vector2 velocity = new Vector2();
 
         if (goingLeft) {
-            velocity.x -= movementSpeed;
+            velocity.x -= MOVEMENT_SPEED;
         }
 
         if (goingRight) {
-            velocity.x += movementSpeed;
+            velocity.x += MOVEMENT_SPEED;
         }
 
         if (goingDown) {
-            velocity.y -= movementSpeed;
+            velocity.y -= MOVEMENT_SPEED;
         }
 
         if (goingUp) {
-            velocity.y += movementSpeed;
+            velocity.y += MOVEMENT_SPEED;
         }
 
         Rectangle huskyRect = new Rectangle(characterRect);
@@ -213,22 +240,25 @@ public class HeinousScreen implements Screen, InputProcessor {
         characterRect.x += velocity.x;
         characterRect.y += velocity.y;
 
-
+//        checkCheckPoints(characterRect, checkPoints);
 
         stateTime += delta;
         currentFrame = characterWalking.getKeyFrame(stateTime);
         main.batch.setColor(main.batch.getColor().r, main.batch.getColor().g, main.batch.getColor().b, 1);
         main.batch.begin();
+
+        // uncomment to draw checkpoints
+//        for (CheckPoint checkPoint : checkPoints) {
+//            checkPoint.draw(main.batch, 1);
+//        }
         main.batch.draw(currentFrame, characterRect.x, characterRect.y, characterRect.width, characterRect.height);
-         main.batch.end();
+        main.batch.end();
 
-        renderDebug();
+//        for (int i = 0; i < currentCheckpointIndex; i++) {
+//            debugRenderer.line(checkPoints.get(i).x, checkPoints.get(i).y, checkPoints.get(i+1).x, checkPoints.get(i+1).y);
+//        }
 
-        //getTiles(startX, startY, endX, endY, tiles, "walls", rectPool);
-        for (Rectangle tile : tiles) {
-            debugRenderer.rect(tile.x, tile.y, tile.width, tile.height);
-        }
-        debugRenderer.end();
+//        renderDebug();
     }
 
     private void renderDebug() {
@@ -237,11 +267,26 @@ public class HeinousScreen implements Screen, InputProcessor {
 
         debugRenderer.setColor(Color.RED);
         debugRenderer.rect(characterRect.x, characterRect.y, characterRect.width, characterRect.height);
-//        getTiles(0, 0, worldWidth, worldHeight, tiles, "walls", rectPool);
-//        for (Rectangle tile : tiles) {
-//            debugRenderer.rect(tile.x, tile.y, tile.width, tile.height);
-//        }
-//        debugRenderer.end();
+        getTiles(0, 0, worldWidth, worldHeight, tiles, "walls", rectPool);
+        for (Rectangle tile : tiles) {
+            debugRenderer.rect(tile.x, tile.y, tile.width, tile.height);
+        }
+        debugRenderer.end();
+    }
+
+    public void checkCheckPoints(Rectangle rect, Array<Vector2> checkpoints){
+        for (int i = 0; i < checkpoints.size; i++) {
+            float originX = (rect.x + rect.width + rect.x)/2f;
+            float originY = (rect.y + rect.height + rect.y)/2f;
+            float checkPointX = checkpoints.get(i).x;
+            float checkPointY = checkpoints.get(i).y;
+            float distance = (float) Math.sqrt(
+                    ((checkPointX - originX) * (checkPointX - originX)) +
+                            ((checkPointY - originY) * (checkPointY - originY)));
+            if (distance <= PATH_BUFFER_DISTANCE) {
+                currentCheckpointIndex = i;
+            }
+        }
     }
 
     @Override
@@ -358,72 +403,9 @@ public class HeinousScreen implements Screen, InputProcessor {
                 for (int x = startX; x <= endX; x++) {
                     TiledMapTileLayer.Cell cell = layer.getCell(x, y);
                     if (cell != null) {
-//                        if (layerName.equalsIgnoreCase("spikes") || layerName.equals("spikesRow2")) {
-//                            Rectangle rect = rectPool.obtain();
-//                            Rectangle rect2 = rectPool.obtain();
-//                            Rectangle rect3 = rectPool.obtain();
-//                            Rectangle rect4 = rectPool.obtain();
-//                            Rectangle rect5 = rectPool.obtain();
-//                            Rectangle rect6 = rectPool.obtain();
-//                            Rectangle rect7 = rectPool.obtain();
-//                            Rectangle rect8 = rectPool.obtain();
-//
-//                            String direction = cell.getTile().getProperties().get("direction", String.class);
-//                            if (direction.equalsIgnoreCase("up")) {
-//                                rect.set(x, y, 7/16f, 3/16f);
-//                                rect2.set(x + 1/16f, y + 3/16f, 5/16f, 3/16f);
-//                                rect3.set(x + 1/8f, y + 3/8f, 3/16f, 3/16f);
-//                                rect4.set(x + 3/16f, y + 9/16f, 1/16f, 1/8f);
-//
-//                                rect5.set(x + 0.5f, y, 7/16f, 3/16f);
-//                                rect6.set(x + 9/16f, y + 3/16f, 5/16f, 3/16f);
-//                                rect7.set(x + 5/8f, y + 3/8f, 3/16f, 3/16f);
-//                                rect8.set(x + 11/16f, y + 9/16f, 1/16f, 1/8f);
-//                            } else if (direction.equalsIgnoreCase("down")) {
-//                                rect.set(x, y + 13/16f, 7/16f, 3/16f);
-//                                rect2.set(x + 1/16f, y + 10/16f, 5/16f, 3/16f);
-//                                rect3.set(x + 1/8f, y + 7/16f, 3/16f, 3/16f);
-//                                rect4.set(x + 3/16f, y + 5/16f, 1/16f, 1/8f);
-//
-//                                rect5.set(x + 0.5f, y + 13/16f, 7/16f, 3/16f);
-//                                rect6.set(x + 9/16f, y + 10/16f, 5/16f, 3/16f);
-//                                rect7.set(x + 5/8f, y + 7/16f, 3/16f, 3/16f);
-//                                rect8.set(x + 11/16f, y + 5/16f, 1/16f, 1/8f);
-//                            } else if (direction.equalsIgnoreCase("left")) {
-//                                rect.set(x + 5/16f, y + 11/16f, 1/8f, 1/16f);
-//                                rect2.set(x + 7/16f, y + 5/8f, 3/16f, 3/16f);
-//                                rect3.set(x + 5/8f, y + 9/16f, 3/16f, 5/16f);
-//                                rect4.set(x + 13/16f, y + 0.5f, 3/16f, 7/16f);
-//
-//                                rect5.set(x + 5/16f, y + 3/16f, 1/8f, 1/16f);
-//                                rect6.set(x + 7/16f, y + 1/8f, 3/16f, 3/16f);
-//                                rect7.set(x + 5/8f, y + 1/16f, 3/16f, 5/16f);
-//                                rect8.set(x + 13/16f, y, 3/16f, 7/16f);
-//                            } else if (direction.equalsIgnoreCase("right")) {
-//                                rect.set(x + 9/16f, y + 11/16f, 1/8f, 1/16f);
-//                                rect2.set(x + 3/8f, y + 5/8f, 3/16f, 3/16f);
-//                                rect3.set(x + 3/16f, y + 9/16f, 3/16f, 5/16f);
-//                                rect4.set(x, y + 0.5f, 3/16f, 7/16f);
-//
-//                                rect5.set(x + 9/16f, y + 3/16f, 1/8f, 1/16f);
-//                                rect6.set(x + 3/8f, y + 1/8f, 3/16f, 3/16f);
-//                                rect7.set(x + 3/16f, y + 1/16f, 3/16f, 5/16f);
-//                                rect8.set(x, y, 3/16f, 7/16f);
-//                            }
-//
-//                            tiles.add(rect);
-//                            tiles.add(rect2);
-//                            tiles.add(rect3);
-//                            tiles.add(rect4);
-//                            tiles.add(rect5);
-//                            tiles.add(rect6);
-//                            tiles.add(rect7);
-//                            tiles.add(rect8);
-//                        } else {
-                            Rectangle rect = rectPool.obtain();
-                            rect.set(x, y, 1, 1);
-                            tiles.add(rect);
-//                        }
+                        Rectangle rect = rectPool.obtain();
+                        rect.set(x, y, 1, 1);
+                        tiles.add(rect);
                     }
                 }
             }
