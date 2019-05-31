@@ -23,8 +23,6 @@ public class Main extends Game {
         preferences = Gdx.app.getPreferences("ExtraCreditsGameJamSave");
         setScreen(new HeinousScreen(this, "tiger.tmx"));
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
-
 	}
 
 	@Override
