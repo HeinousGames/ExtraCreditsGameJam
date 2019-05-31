@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="38" height="36" tilewidth="32" tileheight="32" infinite="0" nextobjectid="6">
+<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="38" height="36" tilewidth="32" tileheight="32" infinite="0" nextobjectid="62">
  <tileset firstgid="1" source="grey_wall_tileset_32x32.tsx"/>
  <tileset firstgid="16" source="tiger.tsx"/>
+ <tileset firstgid="17" source="maze_tiles.tsx"/>
  <objectgroup name="background">
   <object id="5" name="bg" gid="16" x="0" y="1152" width="1216" height="1152"/>
+  <object id="35" gid="24" x="60.6249" y="188.634" width="32" height="32"/>
  </objectgroup>
  <layer name="walls" width="38" height="36">
   <data encoding="csv">
@@ -45,4 +47,231 @@
 8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,9
 </data>
  </layer>
+ <objectgroup name="checkpoints">
+  <object id="8" gid="24" x="640" y="1024" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="10" gid="24" x="352" y="1088" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="11" gid="24" x="640" y="1088" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="12" gid="24" x="512" y="1024" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="13" gid="24" x="720" y="1024" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="44"/>
+   </properties>
+  </object>
+  <object id="15" gid="24" x="720" y="960" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="43"/>
+   </properties>
+  </object>
+  <object id="16" gid="24" x="512" y="896" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="4"/>
+   </properties>
+  </object>
+  <object id="17" gid="24" x="656" y="896" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="5"/>
+   </properties>
+  </object>
+  <object id="19" gid="24" x="656" y="832" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="6"/>
+   </properties>
+  </object>
+  <object id="20" gid="24" x="336" y="832" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="7"/>
+   </properties>
+  </object>
+  <object id="21" gid="24" x="336" y="896" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="8"/>
+   </properties>
+  </object>
+  <object id="22" gid="24" x="448" y="896" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="9"/>
+   </properties>
+  </object>
+  <object id="23" gid="24" x="448" y="960" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="10"/>
+   </properties>
+  </object>
+  <object id="24" gid="24" x="256" y="960" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="11"/>
+   </properties>
+  </object>
+  <object id="25" gid="24" x="256" y="832" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="12"/>
+   </properties>
+  </object>
+  <object id="26" gid="24" x="128" y="832" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="13"/>
+   </properties>
+  </object>
+  <object id="27" gid="24" x="64" y="384" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="16"/>
+   </properties>
+  </object>
+  <object id="28" gid="24" x="64" y="768" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="15"/>
+   </properties>
+  </object>
+  <object id="29" gid="24" x="32" y="64" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="22"/>
+   </properties>
+  </object>
+  <object id="31" gid="24" x="128" y="384" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="17"/>
+   </properties>
+  </object>
+  <object id="32" gid="24" x="192" y="64" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="23"/>
+   </properties>
+  </object>
+  <object id="34" gid="24" x="128" y="224" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="18"/>
+   </properties>
+  </object>
+  <object id="36" gid="24" x="64" y="224" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="19"/>
+   </properties>
+  </object>
+  <object id="37" gid="24" x="64" y="160" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="20"/>
+   </properties>
+  </object>
+  <object id="38" gid="24" x="32" y="160" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="21"/>
+   </properties>
+  </object>
+  <object id="39" gid="24" x="192" y="128" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="24"/>
+   </properties>
+  </object>
+  <object id="41" gid="24" x="288" y="128" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="25"/>
+   </properties>
+  </object>
+  <object id="42" gid="24" x="288" y="64" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="26"/>
+   </properties>
+  </object>
+  <object id="43" gid="24" x="896" y="64" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="27"/>
+   </properties>
+  </object>
+  <object id="45" gid="24" x="896" y="192" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="28"/>
+   </properties>
+  </object>
+  <object id="46" gid="24" x="992" y="192" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="29"/>
+   </properties>
+  </object>
+  <object id="47" gid="24" x="992" y="96" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="30"/>
+   </properties>
+  </object>
+  <object id="48" gid="24" x="1056" y="96" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="31"/>
+   </properties>
+  </object>
+  <object id="49" gid="24" x="1056" y="64" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="32"/>
+   </properties>
+  </object>
+  <object id="50" gid="24" x="1152" y="64" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="33"/>
+   </properties>
+  </object>
+  <object id="51" gid="24" x="1152" y="160" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="34"/>
+   </properties>
+  </object>
+  <object id="52" gid="24" x="1120" y="224" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="36"/>
+   </properties>
+  </object>
+  <object id="53" gid="24" x="1056" y="224" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="37"/>
+   </properties>
+  </object>
+  <object id="54" gid="24" x="1056" y="800" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="38"/>
+   </properties>
+  </object>
+  <object id="55" gid="24" x="960" y="800" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="39"/>
+   </properties>
+  </object>
+  <object id="57" gid="24" x="960" y="896" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="40"/>
+   </properties>
+  </object>
+  <object id="58" gid="24" x="896" y="960" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="42"/>
+   </properties>
+  </object>
+  <object id="59" gid="24" x="896" y="898" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="41"/>
+   </properties>
+  </object>
+  <object id="60" gid="24" x="1120" y="160" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="35"/>
+   </properties>
+  </object>
+  <object id="61" gid="24" x="128" y="768" width="32" height="32">
+   <properties>
+    <property name="position" type="int" value="14"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>
