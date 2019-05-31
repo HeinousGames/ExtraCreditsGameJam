@@ -178,6 +178,7 @@ public class HeinousScreen implements Screen, InputProcessor {
 
         stateTime += delta;
         currentFrame = characterWalking.getKeyFrame(stateTime);
+        main.batch.setColor(main.batch.getColor().r, main.batch.getColor().g, main.batch.getColor().b, 1);
         main.batch.begin();
         main.batch.draw(currentFrame, characterRect.x, characterRect.y, 1, 1);
         main.batch.end();
