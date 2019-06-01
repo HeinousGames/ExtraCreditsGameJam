@@ -20,7 +20,6 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
@@ -55,7 +54,7 @@ public class HeinousScreen implements Screen, InputProcessor {
 
     public int currentCheckpointIndex;
     public Array<CheckPoint> checkPoints;
-    public ArrayList<float[]> foundPaths = new ArrayList();
+    public ArrayList<float[]> foundPaths = new ArrayList<float[]>();
 
     public float percentOfCurrentPath = 0;
 
