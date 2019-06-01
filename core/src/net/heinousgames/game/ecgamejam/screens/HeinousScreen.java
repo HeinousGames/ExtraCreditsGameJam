@@ -28,7 +28,7 @@ import net.heinousgames.game.ecgamejam.Main;
 
 public class HeinousScreen implements Screen, InputProcessor {
 
-    private static final float PATH_BUFFER_DISTANCE = 8;
+    private static final float PATH_BUFFER_DISTANCE = .5f;
     private static final float MOVEMENT_SPEED = .07f;
 
     public Animation<TextureRegion> characterWalking;
@@ -50,6 +50,8 @@ public class HeinousScreen implements Screen, InputProcessor {
 
     public int currentCheckpointIndex;
     public Array<CheckPoint> checkPoints;
+
+    public float percentOfCurrentPath = 0;
 
     public HeinousScreen(Main main, String mapFileName) {
         this.main = main;
@@ -241,7 +243,7 @@ public class HeinousScreen implements Screen, InputProcessor {
         characterRect.x += velocity.x;
         characterRect.y += velocity.y;
 
-//        checkCheckPoints(characterRect, checkPoints);
+        checkCheckPoints(characterRect, checkPoints);
 
         stateTime += delta;
         currentFrame = characterWalking.getKeyFrame(stateTime);
@@ -249,9 +251,10 @@ public class HeinousScreen implements Screen, InputProcessor {
         main.batch.begin();
 
         // uncomment to draw checkpoints
-//        for (CheckPoint checkPoint : checkPoints) {
-//            checkPoint.draw(main.batch, 1);
-//        }
+        for (CheckPoint checkPoint : checkPoints) {
+            checkPoint.draw(main.batch, 1);
+        }
+
         if (goingUp) {
             main.batch.draw(currentFrame, characterRect.x, characterRect.y,
                     characterRect.width / 2f, characterRect.height / 2f,
@@ -275,37 +278,78 @@ public class HeinousScreen implements Screen, InputProcessor {
         }
         main.batch.end();
 
-//        for (int i = 0; i < currentCheckpointIndex; i++) {
-//            debugRenderer.line(checkPoints.get(i).x, checkPoints.get(i).y, checkPoints.get(i+1).x, checkPoints.get(i+1).y);
-//        }
+        debugRenderer.setProjectionMatrix(cameraGamePlay.combined);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-//        renderDebug();
+        debugRenderer.setColor(Color.WHITE);
+        for (int i = 0; i < currentCheckpointIndex; i++) {
+            float checkPoint1X = (checkPoints.get(i).getX() + checkPoints.get(i).getX() + checkPoints.get(i).getWidth())/2f ;
+            float checkPoint1Y = (checkPoints.get(i).getY() + checkPoints.get(i).getY() + checkPoints.get(i).getHeight())/2f;
+            float checkPoint2X = (checkPoints.get(i+1).getX() + checkPoints.get(i+1).getX() + checkPoints.get(i+1).getWidth())/2f ;
+            float checkPoint2Y = (checkPoints.get(i+1).getY() + checkPoints.get(i+1).getY() + checkPoints.get(i+1).getHeight())/2f;
+
+            debugRenderer.rectLine(new Vector2(checkPoint1X,checkPoint1Y),new Vector2(checkPoint2X,checkPoint2Y),8/32f);
+        }
+
+        debugRenderer.end();
+
+
+        //renderDebug();
     }
 
     private void renderDebug() {
         debugRenderer.setProjectionMatrix(cameraGamePlay.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-
+/*
         debugRenderer.setColor(Color.RED);
         debugRenderer.rect(characterRect.x, characterRect.y, characterRect.width, characterRect.height);
+
         getTiles(0, 0, worldWidth, worldHeight, tiles, "walls", rectPool);
         for (Rectangle tile : tiles) {
             debugRenderer.rect(tile.x, tile.y, tile.width, tile.height);
         }
+        */
+        for (int i = 0; i < currentCheckpointIndex; i++) {
+            float checkPoint1X = (checkPoints.get(i).getX() + checkPoints.get(i).getX() + checkPoints.get(i).getWidth())/2f ;
+            float checkPoint1Y = (checkPoints.get(i).getY() + checkPoints.get(i).getY() + checkPoints.get(i).getHeight())/2f;
+            float checkPoint2X = (checkPoints.get(i+1).getX() + checkPoints.get(i+1).getX() + checkPoints.get(i+1).getWidth())/2f ;
+            float checkPoint2Y = (checkPoints.get(i+1).getY() + checkPoints.get(i+1).getY() + checkPoints.get(i+1).getHeight())/2f;
+
+            debugRenderer.line(checkPoint1X, checkPoint1Y, checkPoint2X, checkPoint2Y);
+        }
         debugRenderer.end();
     }
 
-    public void checkCheckPoints(Rectangle rect, Array<Vector2> checkpoints){
+/****** Original proof of concept - changes the index to whatever the last checkPoint you collide with, regardless of your most recent checkPoint
+ *
+    public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
         for (int i = 0; i < checkpoints.size; i++) {
             float originX = (rect.x + rect.width + rect.x)/2f;
             float originY = (rect.y + rect.height + rect.y)/2f;
-            float checkPointX = checkpoints.get(i).x;
-            float checkPointY = checkpoints.get(i).y;
+            float checkPointX = (checkpoints.get(i).getX() + checkpoints.get(i).getX() + checkpoints.get(i).getWidth())/2f ;
+            float checkPointY = (checkpoints.get(i).getY() + checkpoints.get(i).getY() + checkpoints.get(i).getHeight())/2f;
             float distance = (float) Math.sqrt(
                     ((checkPointX - originX) * (checkPointX - originX)) +
                             ((checkPointY - originY) * (checkPointY - originY)));
             if (distance <= PATH_BUFFER_DISTANCE) {
                 currentCheckpointIndex = i;
+            }
+        }
+    }
+
+*/
+
+/*** Game mode/Option one, Must be sequential ***/
+
+    public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
+        if(currentCheckpointIndex < checkpoints.size - 1){
+            float originX = (rect.x + rect.width + rect.x)/2f;
+            float originY = (rect.y + rect.height + rect.y)/2f;
+            float checkPointX = (checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getWidth())/2f ;
+            float checkPointY = (checkpoints.get(currentCheckpointIndex + 1).getY() + checkpoints.get(currentCheckpointIndex + 1).getY() + checkpoints.get(currentCheckpointIndex + 1).getHeight())/2f;
+            float distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
+            if (distance <= PATH_BUFFER_DISTANCE) {
+                currentCheckpointIndex++;
             }
         }
     }
