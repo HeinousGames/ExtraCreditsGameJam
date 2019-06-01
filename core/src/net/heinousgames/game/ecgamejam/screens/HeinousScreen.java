@@ -149,15 +149,20 @@ public class HeinousScreen implements Screen, InputProcessor {
             if (bgAlphaIncreasing) {
                 bgAlpha += 0.005f;
                 wallLayerAlpha -= 0.005f;
-            } else {
-                bgAlpha -= 0.005f;
-                wallLayerAlpha += 0.005f;
+//            } else {
+//                bgAlpha -= 0.005f;
+//                wallLayerAlpha += 0.005f;
             }
 
             if (bgAlpha >= 1) {
-                bgAlphaIncreasing = false;
-            } else if (bgAlpha <= 0) {
-                bgAlphaIncreasing = true;
+//                bgAlphaIncreasing = false;
+//            } else if (bgAlpha <= 0) {
+//                bgAlphaIncreasing = true;
+                bgAlpha = 1;
+            }
+
+            if (wallLayerAlpha <= 0) {
+                wallLayerAlpha = 0;
             }
         } else {
             bgAlpha = 0;
@@ -326,6 +331,11 @@ public class HeinousScreen implements Screen, InputProcessor {
 
         debugRenderer.end();
 
+        if (currentCheckpointIndex == checkPoints.size) {
+            holdingSpace = true;
+//            dispose();
+//            main.setScreen(new HeinousScreen(main, "tiger.tmx"));
+        }
 
         //renderDebug();
     }
