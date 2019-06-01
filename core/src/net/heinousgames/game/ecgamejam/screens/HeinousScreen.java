@@ -34,7 +34,6 @@ public class HeinousScreen implements Screen, InputProcessor {
     private static final float COLOR_FREQUENCY = 0.21f;
     private static final float MOVEMENT_SPEED = .07f;
     private static final float PATH_BUFFER_DISTANCE = .5f;
-    private static final float MOVEMENT_SPEED = .07f;
 
     public Animation<TextureRegion> characterWalking;
     public Array<Rectangle> tiles;
@@ -370,7 +369,7 @@ public class HeinousScreen implements Screen, InputProcessor {
         for (int i = 0; i < checkpoints.size; i++) {
             float originX = (rect.x + rect.width + rect.x)/2f;
             float originY = (rect.y + rect.height + rect.y)/2f;
-            float checkPointX = (checkpoints.get(i).getX() + checkpoints.get(i).getX() + checkpoints.get(i).getWidth())/2f ;
+            float checkPointX = (checkpoints.get(i).getX() + checkpoints.get(i).getX() + checkpoints.get(i).getWidth())/2f;
             float checkPointY = (checkpoints.get(i).getY() + checkpoints.get(i).getY() + checkpoints.get(i).getHeight())/2f;
             float distance = (float) Math.sqrt(
                     ((checkPointX - originX) * (checkPointX - originX)) +
@@ -413,7 +412,7 @@ public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
     if(currentCheckpointIndex != 0){
         float originX = (rect.x + rect.width + rect.x)/2f;
         float originY = (rect.y + rect.height + rect.y)/2f;
-        float checkPointX = (checkpoints.get(currentCheckpointIndex - 1).getX() + checkpoints.get(currentCheckpointIndex - 1).getX() + checkpoints.get(currentCheckpointIndex -1).getWidth())/2f ;
+        float checkPointX = (checkpoints.get(currentCheckpointIndex - 1).getX() + checkpoints.get(currentCheckpointIndex - 1).getX() + checkpoints.get(currentCheckpointIndex -1).getWidth())/2f;
         float checkPointY = (checkpoints.get(currentCheckpointIndex - 1).getY() + checkpoints.get(currentCheckpointIndex - 1).getY() + checkpoints.get(currentCheckpointIndex - 1).getHeight())/2f;
         float distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
         if (distance <= PATH_BUFFER_DISTANCE) {
@@ -427,7 +426,7 @@ public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
     if(currentCheckpointIndex < checkpoints.size - 1){
         float originX = (rect.x + rect.width + rect.x)/2f;
         float originY = (rect.y + rect.height + rect.y)/2f;
-        float checkPointX = (checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getWidth())/2f ;
+        float checkPointX = (checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getWidth())/2f;
         float checkPointY = (checkpoints.get(currentCheckpointIndex + 1).getY() + checkpoints.get(currentCheckpointIndex + 1).getY() + checkpoints.get(currentCheckpointIndex + 1).getHeight())/2f;
         float distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
         if (distance <= PATH_BUFFER_DISTANCE) {
