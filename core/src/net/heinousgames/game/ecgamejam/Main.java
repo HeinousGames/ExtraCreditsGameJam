@@ -21,7 +21,7 @@ public class Main extends Game {
         batch = new SpriteBatch();
         mapLoader = new TmxMapLoader();
         preferences = Gdx.app.getPreferences("ExtraCreditsGameJamSave");
-        setScreen(new HeinousScreen(this, "tiger.tmx"));
+        setScreen(new HeinousScreen(this, "drawbridge.tmx"));
 	}
 
 	@Override

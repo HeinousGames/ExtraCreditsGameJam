@@ -86,7 +86,7 @@ public class HeinousScreen implements Screen, InputProcessor {
         //characterY = 4;
 
         //characterRect = new Rectangle(characterX, characterY, 1, 1);
-        characterRect = new Rectangle(11, 4, (7/16f), (7/16f));
+        characterRect = new Rectangle(1, 32.5f, (7/16f), (7/16f));
         //characterCircle = new Circle(11, 4, (5/16f));
 
         rectPool = new Pool<Rectangle>() {
