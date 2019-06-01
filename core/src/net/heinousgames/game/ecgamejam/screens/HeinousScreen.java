@@ -31,6 +31,8 @@ import java.util.ArrayList;
 
 public class HeinousScreen implements Screen, InputProcessor {
 
+    private static final float COLOR_FREQUENCY = 0.21f;
+    private static final float MOVEMENT_SPEED = .07f;
     private static final float PATH_BUFFER_DISTANCE = .5f;
     private static final float MOVEMENT_SPEED = .07f;
 
@@ -39,6 +41,7 @@ public class HeinousScreen implements Screen, InputProcessor {
     public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing,
             upMemory, downMemory, leftMemory, rightMemory;
     private float bgAlpha, wallLayerAlpha, stateTime;
+    private float red, green, blue, colorCounter;
     private Image bg;
     private int worldWidth, worldHeight;
     public Main main;
@@ -62,6 +65,8 @@ public class HeinousScreen implements Screen, InputProcessor {
         bgAlpha = 0;
         bgAlphaIncreasing = true;
         wallLayerAlpha = 1;
+        colorCounter = 0f;
+        red = green = blue = 1;
         debugRenderer = new ShapeRenderer();
         map = main.mapLoader.load(mapFileName);
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 32f);
@@ -285,9 +290,14 @@ public class HeinousScreen implements Screen, InputProcessor {
         debugRenderer.setProjectionMatrix(cameraGamePlay.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        debugRenderer.setColor(Color.WHITE);
+        red = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 0) * 127 + 128) / 255f;
+        green = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 2) * 127 + 128) / 255f;
+        blue = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 4) * 127 + 128) / 255f;
 
-        /*** goes with the sequential mode ***
+        colorCounter += delta * 11f;
+        debugRenderer.setColor(red, green, blue, 1);
+
+        /*** goes with the sequential mode ***/
         for (int i = 0; i < currentCheckpointIndex; i++) {
             float checkPoint1X = (checkPoints.get(i).getX() + checkPoints.get(i).getX() + checkPoints.get(i).getWidth())/2f ;
             float checkPoint1Y = (checkPoints.get(i).getY() + checkPoints.get(i).getY() + checkPoints.get(i).getHeight())/2f;
