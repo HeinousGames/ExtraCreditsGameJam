@@ -218,7 +218,7 @@
   </object>
   <object id="99" gid="24" x="768" y="800" width="32" height="32">
    <properties>
-    <property name="position" type="int" value="32"/>
+    <property name="position" type="int" value="33"/>
    </properties>
   </object>
   <object id="101" gid="24" x="768" y="736" width="32" height="32">
