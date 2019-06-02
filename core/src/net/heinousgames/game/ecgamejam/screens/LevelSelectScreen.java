@@ -25,12 +25,6 @@ public class LevelSelectScreen implements Screen {
 
         stageUI = new Stage(new StretchViewport(960, 540, camera));
 
-        /*
-         * Create table class:
-         * - Text Label for level number, more labels for dogs and coins
-         * - pass in screen class it should open
-         */
-
         LevelSelectTable table1 = new LevelSelectTable(main, 1);
         LevelSelectTable table2 = new LevelSelectTable(main, 2);
 //        LevelSelectTable table3 = new LevelSelectTable(main, 3, "1_3", "1_2");
@@ -58,6 +52,8 @@ public class LevelSelectScreen implements Screen {
 
         stageUI.addActor(btnTable);
 
+        main.batch.setProjectionMatrix(camera.combined);
+
 //        btnTable.debug();
 
 //        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("sfx/select_screen.mp3"));
@@ -79,7 +75,7 @@ public class LevelSelectScreen implements Screen {
         main.batch.draw(main.bg, 0, 0);
         main.batch.end();
 
-        stageUI.getViewport().apply();
+//        stageUI.getViewport().apply();
         stageUI.act();
         stageUI.draw();
     }
