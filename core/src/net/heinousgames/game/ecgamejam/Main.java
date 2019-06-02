@@ -40,12 +40,12 @@ public class Main extends Game {
         windows = new Texture("Windows.png");
 
         TextureRegion exitUp = new TextureRegion(buttons, 128, 4000, 190, 190);
-        TextureRegion exitDown = new TextureRegion(buttons, 534, 4000, 190, 190);
-        TextureRegion exitOver = new TextureRegion(buttons, 324, 4000, 190, 190);
+        TextureRegion exitDown = new TextureRegion(buttons, 529, 4000, 190, 190);
+        TextureRegion exitOver = new TextureRegion(buttons, 320, 4000, 190, 190);
 
         TextureRegion playUp = new TextureRegion(buttons, 128, 760, 190, 190);
-        TextureRegion playDown = new TextureRegion(buttons, 534, 760, 190, 190);
-        TextureRegion playOver = new TextureRegion(buttons, 324, 760, 190, 190);
+        TextureRegion playDown = new TextureRegion(buttons, 529, 760, 190, 190);
+        TextureRegion playOver = new TextureRegion(buttons, 320, 760, 190, 190);
 
         stylePlay = new ImageButton.ImageButtonStyle();
         stylePlay.up = new TextureRegionDrawable(new TextureRegion(playUp));
