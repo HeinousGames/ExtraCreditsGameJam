@@ -80,8 +80,10 @@ public class HeinousScreen implements InputProcessor, Screen {
         debugRenderer = new ShapeRenderer();
         if (level == 1) {
             map = main.mapLoader.load("drawbridge.tmx");
+            characterRect = new Rectangle(1, 32.5f, (7/16f), (7/16f));
         } else if (level == 2) {
             map = main.mapLoader.load("tiger.tmx");
+            characterRect = new Rectangle(11, 2, (7/16f), (7/16f));
         }
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 32f);
         worldWidth = map.getProperties().get("width", Integer.class);
@@ -111,7 +113,6 @@ public class HeinousScreen implements InputProcessor, Screen {
         //characterY = 4;
 
         //characterRect = new Rectangle(characterX, characterY, 1, 1);
-        characterRect = new Rectangle(1, 32.5f, (7/16f), (7/16f));
         //characterCircle = new Circle(11, 4, (5/16f));
 
         rectPool = new Pool<Rectangle>() {
@@ -135,8 +136,8 @@ public class HeinousScreen implements InputProcessor, Screen {
                     TextureRegion textureRegion = ((TiledMapTileMapObject) mapObject).getTextureRegion();
                     float x = ((TiledMapTileMapObject) mapObject).getX();
                     float y = ((TiledMapTileMapObject) mapObject).getY();
-                    int position = mapObject.getProperties().get("position", Integer.class);
-                    checkPoints.set(position, new CheckPoint(textureRegion, x/32f, y/32f));
+                    int pos = mapObject.getProperties().get("position", Integer.class);
+                    checkPoints.set(pos, new CheckPoint(textureRegion, x/32f, y/32f));
                 }
             }
         }
