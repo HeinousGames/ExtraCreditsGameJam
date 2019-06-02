@@ -37,7 +37,7 @@ import java.util.ArrayList;
 public class HeinousScreen implements InputProcessor, Screen {
 
     private static final float COLOR_FREQUENCY = 0.21f;
-    private static final float MOVEMENT_SPEED = .07f;
+    private static final float MOVEMENT_SPEED = .11f;
     private static final float PATH_BUFFER_DISTANCE = .5f;
 
     public Animation<TextureRegion> characterWalking;
@@ -63,6 +63,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     public int currentCheckpointIndex;
     public Array<CheckPoint> checkPoints;
     public ArrayList<float[]> foundPaths = new ArrayList<float[]>();
+    boolean win = false;
 
 
     public float percentOfCurrentPath = 0;
@@ -281,7 +282,7 @@ public class HeinousScreen implements InputProcessor, Screen {
         characterRect.x += velocity.x;
         characterRect.y += velocity.y;
 
-        //addToPaths(characterRect, checkPoints);
+        addToPaths(characterRect, checkPoints);
 
         stateTime += delta;
         currentFrame = characterWalking.getKeyFrame(stateTime);
@@ -364,7 +365,10 @@ public class HeinousScreen implements InputProcessor, Screen {
 
         debugRenderer.end();
 
-        if (foundPaths.size() == checkPoints.size) {
+        if (foundPaths.size() == checkPoints.size && !win) {
+            win = true;
+            main.bgMusic.pause();
+            gameWin.play();
             holdingSpace = true;
             main.prefs.putBoolean("level".concat(String.valueOf(level)), true).flush();
 //            dispose();
@@ -752,6 +756,7 @@ public class HeinousScreen implements InputProcessor, Screen {
 
         if (keycode == Input.Keys.SPACE) {
             holdingSpace = false;
+            win = false;
             bgAlpha = 0;
         }
         return false;
