@@ -7,8 +7,8 @@ import net.heinousgames.game.ecgamejam.Main;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width = 1088;
-        config.height = 1088;
+        config.width = 1366;
+        config.height = 768;
 		new LwjglApplication(new Main(), config);
 	}
 }
