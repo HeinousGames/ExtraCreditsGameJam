@@ -17,6 +17,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -55,6 +56,7 @@ public class HeinousScreen implements Screen, InputProcessor {
     public int currentCheckpointIndex;
     public Array<CheckPoint> checkPoints;
     public ArrayList<float[]> foundPaths = new ArrayList<float[]>();
+
 
     public float percentOfCurrentPath = 0;
 
@@ -252,10 +254,12 @@ public class HeinousScreen implements Screen, InputProcessor {
         }
 
 
+        checkCheckPoints(characterRect, checkPoints);
+
         characterRect.x += velocity.x;
         characterRect.y += velocity.y;
 
-        checkCheckPoints(characterRect, checkPoints);
+        addToPaths(characterRect, checkPoints);
 
         stateTime += delta;
         currentFrame = characterWalking.getKeyFrame(stateTime);
@@ -326,6 +330,15 @@ public class HeinousScreen implements Screen, InputProcessor {
         for (float[] positions: foundPaths) {
             debugRenderer.rectLine(new Vector2(positions[0],positions[1]),new Vector2(positions[2],positions[3]),8/32f);
         }
+        for (CheckPoint cp: checkPoints) {
+            if(cp.originVec.x != cp.furthestPointTowardsLowerCheckpoint.x || cp.originVec.y != cp.furthestPointTowardsLowerCheckpoint.y){
+                debugRenderer.rectLine(cp.originVec,cp.furthestPointTowardsLowerCheckpoint,8/32f);
+            }
+
+            if(cp.originVec.x != cp.furthestPointTowardsHigherCheckpoint.x || cp.originVec.y != cp.furthestPointTowardsHigherCheckpoint.y){
+                debugRenderer.rectLine(cp.originVec,cp.furthestPointTowardsHigherCheckpoint,8/32f);
+            }
+        }
 
         debugRenderer.end();
 
@@ -385,8 +398,10 @@ public class HeinousScreen implements Screen, InputProcessor {
 /*** Game mode/Option one, Must be sequential **
 
     public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints) {
+
         float originX = (rect.x + rect.width + rect.x)/2f;
         float originY = (rect.y + rect.height + rect.y)/2f;
+
         if (currentCheckpointIndex < checkpoints.size - 1) {
             float checkPointX = (checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getWidth())/2f;
             float checkPointY = (checkpoints.get(currentCheckpointIndex + 1).getY() + checkpoints.get(currentCheckpointIndex + 1).getY() + checkpoints.get(currentCheckpointIndex + 1).getHeight())/2f;
@@ -402,6 +417,32 @@ public class HeinousScreen implements Screen, InputProcessor {
                 currentCheckpointIndex++;
             }
         }
+
+        for (int i = 0; i < checkpoints.size; i++) {
+            float checkPointX = (checkpoints.get(i).getX() + checkpoints.get(i).getX() + checkpoints.get(i).getWidth())/2f;
+            float checkPointY = (checkpoints.get(i).getY() + checkpoints.get(i).getY() + checkpoints.get(i).getHeight())/2f;
+            float distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
+            if (distance <= PATH_BUFFER_DISTANCE) {
+                currentCheckpointIndex = i;
+            }else{
+                if(checkpoints.get(i).furthestPointTowardsHigherCheckpoint != null){
+                    checkPointX = checkpoints.get(i).furthestPointTowardsHigherCheckpoint.x;
+                    checkPointY = checkpoints.get(i).furthestPointTowardsHigherCheckpoint.y;
+                    distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
+                    if (distance <= PATH_BUFFER_DISTANCE) {
+                        currentCheckpointIndex = i;
+                    }
+                }
+                if(checkpoints.get(i).furthestPointTowardsLowerCheckpoint != null){
+                    checkPointX = checkpoints.get(i).furthestPointTowardsLowerCheckpoint.x;
+                    checkPointY = checkpoints.get(i).furthestPointTowardsLowerCheckpoint.y;
+                    distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
+                    if (distance <= PATH_BUFFER_DISTANCE) {
+                        currentCheckpointIndex = i;
+                    }
+                }
+            }
+        }
     }
 
 
@@ -413,11 +454,9 @@ public class HeinousScreen implements Screen, InputProcessor {
         float originY = (rect.y + rect.height + rect.y)/2f;
 
         if(currentCheckpointIndex != 0){
-            float checkPointX = (checkpoints.get(currentCheckpointIndex - 1).getX() + checkpoints.get(currentCheckpointIndex - 1).getX() + checkpoints.get(currentCheckpointIndex -1).getWidth())/2f;
-            float checkPointY = (checkpoints.get(currentCheckpointIndex - 1).getY() + checkpoints.get(currentCheckpointIndex - 1).getY() + checkpoints.get(currentCheckpointIndex - 1).getHeight())/2f;
-            float distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
+            float distance = distance(checkpoints.get(currentCheckpointIndex - 1).originVec, new Vector2(originX, originY));
             if (distance <= PATH_BUFFER_DISTANCE) {
-                float[] tempPositions = {(checkpoints.get(currentCheckpointIndex).getX() + checkpoints.get(currentCheckpointIndex).getX() + checkpoints.get(currentCheckpointIndex).getWidth())/2f, (checkpoints.get(currentCheckpointIndex).getY() + checkpoints.get(currentCheckpointIndex).getY() + checkpoints.get(currentCheckpointIndex).getHeight())/2f, checkPointX, checkPointY};
+                float[] tempPositions = {checkpoints.get(currentCheckpointIndex).originX, (checkpoints.get(currentCheckpointIndex).originY), checkpoints.get(currentCheckpointIndex - 1).originX, checkpoints.get(currentCheckpointIndex - 1).originY};
                 if(!foundPaths.contains(tempPositions)){
                     foundPaths.add(tempPositions);
                 }
@@ -427,7 +466,7 @@ public class HeinousScreen implements Screen, InputProcessor {
         if(currentCheckpointIndex < checkpoints.size - 1){
             float checkPointX = (checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getX() + checkpoints.get(currentCheckpointIndex + 1).getWidth())/2f;
             float checkPointY = (checkpoints.get(currentCheckpointIndex + 1).getY() + checkpoints.get(currentCheckpointIndex + 1).getY() + checkpoints.get(currentCheckpointIndex + 1).getHeight())/2f;
-            float distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
+            float distance = distance(checkPointX, checkPointY, originX, originY);
             if (distance <= PATH_BUFFER_DISTANCE) {
                 float[] tempPositions = {(checkpoints.get(currentCheckpointIndex).getX() + checkpoints.get(currentCheckpointIndex).getX() + checkpoints.get(currentCheckpointIndex).getWidth())/2f, (checkpoints.get(currentCheckpointIndex).getY() + checkpoints.get(currentCheckpointIndex).getY() + checkpoints.get(currentCheckpointIndex).getHeight())/2f, checkPointX, checkPointY};
                 if(!foundPaths.contains(tempPositions)){
@@ -439,7 +478,7 @@ public class HeinousScreen implements Screen, InputProcessor {
         if (currentCheckpointIndex == checkpoints.size - 1) {
             float checkPointX = (checkpoints.get(0).getX() + checkpoints.get(0).getX() + checkpoints.get(0).getWidth())/2f;
             float checkPointY = (checkpoints.get(0).getY() + checkpoints.get(0).getY() + checkpoints.get(0).getHeight())/2f;
-            float distance = (float) Math.sqrt(((checkPointX - originX) * (checkPointX - originX)) + ((checkPointY - originY) * (checkPointY - originY)));
+            float distance = distance(checkPointX, checkPointY, originX, originY);
             if (distance <= PATH_BUFFER_DISTANCE) {
                 float[] tempPositions = {(checkpoints.get(currentCheckpointIndex).getX() + checkpoints.get(currentCheckpointIndex).getX() + checkpoints.get(currentCheckpointIndex).getWidth())/2f, (checkpoints.get(currentCheckpointIndex).getY() + checkpoints.get(currentCheckpointIndex).getY() + checkpoints.get(currentCheckpointIndex).getHeight())/2f, checkPointX, checkPointY};
                 if(!foundPaths.contains(tempPositions)){
@@ -451,11 +490,111 @@ public class HeinousScreen implements Screen, InputProcessor {
         for (int i = 0; i < checkpoints.size; i++) {
             float checkPointX = (checkpoints.get(i).getX() + checkpoints.get(i).getX() + checkpoints.get(i).getWidth())/2f;
             float checkPointY = (checkpoints.get(i).getY() + checkpoints.get(i).getY() + checkpoints.get(i).getHeight())/2f;
-            float distance = (float) Math.sqrt(
-                    ((checkPointX - originX) * (checkPointX - originX)) +
-                            ((checkPointY - originY) * (checkPointY - originY)));
+            float distance = distance(checkPointX, checkPointY, originX,originY);
             if (distance <= PATH_BUFFER_DISTANCE) {
                 currentCheckpointIndex = i;
+            }else{
+                if(checkpoints.get(i).furthestPointTowardsHigherCheckpoint != null){
+                    checkPointX = checkpoints.get(i).furthestPointTowardsHigherCheckpoint.x;
+                    checkPointY = checkpoints.get(i).furthestPointTowardsHigherCheckpoint.y;
+                    distance = distance(checkPointX, checkPointY, originX, originY);
+                    if (distance <= PATH_BUFFER_DISTANCE) {
+                        currentCheckpointIndex = i;
+                    }
+                }
+                if(checkpoints.get(i).furthestPointTowardsLowerCheckpoint != null){
+                    checkPointX = checkpoints.get(i).furthestPointTowardsLowerCheckpoint.x;
+                    checkPointY = checkpoints.get(i).furthestPointTowardsLowerCheckpoint.y;
+                    distance = distance(checkPointX, checkPointY, originX, originY);
+                    if (distance <= PATH_BUFFER_DISTANCE) {
+                        currentCheckpointIndex = i;
+                    }
+                }
+            }
+        }
+    }
+
+    public float distance(Vector2 point1, Vector2 point2){
+        return (float)Math.sqrt(Math.pow(point2.x - point1.x,2) + Math.pow(point2.y - point1.y,2));
+    }
+
+    public float distance(float x1, float y1, float x2, float y2){
+        return (float)Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2- y1,2));
+    }
+
+
+
+    public void addToPaths(Rectangle characterRect, Array<CheckPoint> checkPoints){
+
+        float originX = (characterRect.x + characterRect.width + characterRect.x)/2f;
+        float originY = (characterRect.y + characterRect.height + characterRect.y)/2f;
+
+        float distance = distance(checkPoints.get(currentCheckpointIndex).furthestPointTowardsLowerCheckpoint,new Vector2(originX,originY));
+        if(distance <= PATH_BUFFER_DISTANCE){
+            int lastIndex = currentCheckpointIndex - 1;
+            if(currentCheckpointIndex == 0){
+                lastIndex = checkPoints.size -1;
+            }
+            float deltaY = checkPoints.get(currentCheckpointIndex).originY - checkPoints.get(lastIndex).originY;
+            float deltaC = distance(checkPoints.get(currentCheckpointIndex).originX, checkPoints.get(currentCheckpointIndex).originY,checkPoints.get(lastIndex).originX,checkPoints.get(lastIndex).originY);
+            float angleY = (float)(Math.asin((deltaY/deltaC)) * 180 / Math.PI);
+            float playerPerpendicularAngle1 = (float)((angleY - 90) * Math.PI)/180f;
+            float playerPerpendicularAngle2 = (float)((angleY + 90) * Math.PI)/180f;
+            Vector2 playerRadiusPoint1 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle1)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle1)));
+            Vector2 playerRadiusPoint2 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle2)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle2)));
+
+
+            debugRenderer.setProjectionMatrix(cameraGamePlay.combined);
+            debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+            debugRenderer.setColor(Color.GREEN);
+            debugRenderer.line(playerRadiusPoint1, playerRadiusPoint2);
+
+            debugRenderer.end();
+
+
+
+            Vector2 intersectPoint = new Vector2();
+            Intersector.intersectSegments(playerRadiusPoint1, playerRadiusPoint2,checkPoints.get(currentCheckpointIndex).originVec,checkPoints.get(lastIndex).originVec,intersectPoint);
+            float intersectDistance = distance(intersectPoint,checkPoints.get(lastIndex).originVec);
+            float furthestPointDistance = distance(checkPoints.get(currentCheckpointIndex).furthestPointTowardsLowerCheckpoint,checkPoints.get(lastIndex).originVec);
+            if(intersectDistance < furthestPointDistance){
+                checkPoints.get(currentCheckpointIndex).furthestPointTowardsLowerCheckpoint.set(intersectPoint);
+            }
+        }
+
+        distance = distance(checkPoints.get(currentCheckpointIndex).furthestPointTowardsHigherCheckpoint,new Vector2(originX,originY));
+        if(distance <= PATH_BUFFER_DISTANCE){
+            int nextIndex = currentCheckpointIndex + 1;
+            if(currentCheckpointIndex == checkPoints.size -1){
+                nextIndex = 0;
+            }
+            float deltaY = checkPoints.get(currentCheckpointIndex).originY - checkPoints.get(nextIndex).originY;
+            float deltaC = distance(checkPoints.get(currentCheckpointIndex).originVec, checkPoints.get(nextIndex).originVec);
+            float angleY = (float)(Math.asin((deltaY/deltaC)) * 180 / Math.PI);
+            float playerPerpendicularAngle1 = (float)((angleY - 90) * Math.PI)/180f;
+            float playerPerpendicularAngle2 = (float)((angleY + 90) * Math.PI)/180f;
+            Vector2 playerRadiusPoint1 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle1)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle1)));
+            Vector2 playerRadiusPoint2 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle2)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle2)));
+
+
+            debugRenderer.setProjectionMatrix(cameraGamePlay.combined);
+            debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+            debugRenderer.setColor(Color.RED);
+            debugRenderer.line(playerRadiusPoint1, playerRadiusPoint2);
+
+            debugRenderer.end();
+
+
+
+
+            Vector2 intersectPoint = new Vector2();
+            Intersector.intersectSegments(playerRadiusPoint1, playerRadiusPoint2,checkPoints.get(currentCheckpointIndex).originVec,checkPoints.get(nextIndex).originVec,intersectPoint);
+            float intersectDistance = distance(intersectPoint,checkPoints.get(nextIndex).originVec);
+            float furthestPointDistance = distance(checkPoints.get(currentCheckpointIndex).furthestPointTowardsHigherCheckpoint,checkPoints.get(nextIndex).originVec);
+            if(intersectDistance < furthestPointDistance){
+                checkPoints.get(currentCheckpointIndex).furthestPointTowardsHigherCheckpoint.set(intersectPoint);
             }
         }
     }
