@@ -29,12 +29,11 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import net.heinousgames.game.ecgamejam.CheckPoint;
 import net.heinousgames.game.ecgamejam.Main;
-import net.heinousgames.game.ecgamejam.windows.BaseWindow;
-import net.heinousgames.game.ecgamejam.windows.LevelFinishedStatusWindow;
+import net.heinousgames.game.ecgamejam.LevelFinishedStatusTable;
 
 import java.util.ArrayList;
 
-public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProcessor, Screen {
+public class HeinousScreen implements InputProcessor, Screen {
 
     private static final float COLOR_FREQUENCY = 0.21f;
     private static final float MOVEMENT_SPEED = .07f;
@@ -170,7 +169,11 @@ public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProces
                 bgAlpha = 1;
                 if (!displayLevelCompleteWindow) {
                     displayLevelCompleteWindow = true;
-                    stageDialogs.addActor(new LevelFinishedStatusWindow(this, main, level));
+                    LevelFinishedStatusTable window = new LevelFinishedStatusTable(main, level);
+                    window.setBounds(cameraDialogs.viewportWidth/2 - cameraDialogs.viewportWidth/4,
+                            cameraDialogs.viewportHeight/2 - cameraDialogs.viewportHeight/4
+                            , cameraDialogs.viewportWidth/2, cameraDialogs.viewportHeight/2);
+                    stageDialogs.addActor(window);
                 }
             }
 
@@ -739,10 +742,5 @@ public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProces
                 }
             }
         }
-    }
-
-    @Override
-    public void buttonClick(String key) {
-
     }
 }
