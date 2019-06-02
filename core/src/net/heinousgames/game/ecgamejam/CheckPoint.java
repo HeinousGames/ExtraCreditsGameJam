@@ -8,8 +8,8 @@ public class CheckPoint extends Image {
 
     public boolean connectedHigher = false;
     public boolean connectedLower = false;
-    public Vector2 furthestPointTowardsHigherCheckpoint = new Vector2();
-    public Vector2 furthestPointTowardsLowerCheckpoint = new Vector2();
+    public Vector2 furthestPointTowardsHigherCheckpoint;
+    public Vector2 furthestPointTowardsLowerCheckpoint;
     public float originX;
     public float originY;
     public Vector2 originVec;
@@ -20,8 +20,8 @@ public class CheckPoint extends Image {
         originY = (y + y + this.getHeight())/2f;
         originX = (x + x + this.getWidth())/2f;
         originVec = new Vector2(originX, originY);
-        furthestPointTowardsLowerCheckpoint.set(originX, originY);
-        furthestPointTowardsHigherCheckpoint.set(originX,originY);
+        furthestPointTowardsLowerCheckpoint = new Vector2(originX, originY);
+        furthestPointTowardsHigherCheckpoint = new Vector2(originX,originY);
     }
 
 }

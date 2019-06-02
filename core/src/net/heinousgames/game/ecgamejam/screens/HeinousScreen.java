@@ -273,7 +273,7 @@ public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProces
         characterRect.x += velocity.x;
         characterRect.y += velocity.y;
 
-        addToPaths(characterRect, checkPoints);
+        //addToPaths(characterRect, checkPoints);
 
         stateTime += delta;
         currentFrame = characterWalking.getKeyFrame(stateTime);
@@ -356,8 +356,7 @@ public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProces
 
         debugRenderer.end();
 
-        if (currentCheckpointIndex == checkPoints.size ||
-                foundPaths.size() == checkPoints.size) {
+        if (foundPaths.size() == checkPoints.size) {
             holdingSpace = true;
             main.prefs.putBoolean("level".concat(String.valueOf(level)), true).flush();
 //            dispose();
@@ -464,7 +463,7 @@ public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProces
     }
 
 
-    /*** Game mode/Option two, doesn't need to be sequential **/
+    /*** Game mode/Option two, doesn't need to be sequential **
 
     public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
 
@@ -531,6 +530,59 @@ public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProces
             }
         }
     }
+*/
+    /*** Game mode/Option two, doesn't need to be sequential Now with path meeting technology**/
+
+    public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
+
+        float originX = (rect.x + rect.width + rect.x)/2f;
+        float originY = (rect.y + rect.height + rect.y)/2f;
+        int lastIndex = (currentCheckpointIndex == 0) ? checkpoints.size - 1  : currentCheckpointIndex - 1;
+        int nextIndex = (currentCheckpointIndex == checkpoints.size -1) ? 0 : currentCheckpointIndex + 1;
+
+            float distance = distance(checkpoints.get(lastIndex).originVec, new Vector2(originX, originY));
+            if (distance <= PATH_BUFFER_DISTANCE && !checkpoints.get(lastIndex).connectedHigher) {
+                float[] tempPositions = {checkpoints.get(currentCheckpointIndex).originX, (checkpoints.get(currentCheckpointIndex).originY), checkpoints.get(lastIndex).originX, checkpoints.get(lastIndex).originY};
+                foundPaths.add(tempPositions);
+                checkpoints.get(lastIndex).connectedHigher = true;
+                checkpoints.get(currentCheckpointIndex).connectedLower = true;
+            }
+
+            distance = distance(checkpoints.get(nextIndex).originVec, new Vector2(originX, originY));
+            if (distance <= PATH_BUFFER_DISTANCE && !checkpoints.get(nextIndex).connectedLower) {
+                float[] tempPositions = {checkpoints.get(currentCheckpointIndex).originX, (checkpoints.get(currentCheckpointIndex).originY), checkpoints.get(nextIndex).originX, checkpoints.get(nextIndex).originY};
+                foundPaths.add(tempPositions);
+                checkpoints.get(nextIndex).connectedLower = true;
+                checkpoints.get(currentCheckpointIndex).connectedHigher = true;
+            }
+
+        for (int i = 0; i < checkpoints.size; i++) {
+            float checkPointX = (checkpoints.get(i).getX() + checkpoints.get(i).getX() + checkpoints.get(i).getWidth())/2f;
+            float checkPointY = (checkpoints.get(i).getY() + checkpoints.get(i).getY() + checkpoints.get(i).getHeight())/2f;
+            distance = distance(checkPointX, checkPointY, originX,originY);
+            if (distance <= PATH_BUFFER_DISTANCE) {
+                currentCheckpointIndex = i;
+            }else{
+                if(checkpoints.get(i).furthestPointTowardsHigherCheckpoint != null){
+                    checkPointX = checkpoints.get(i).furthestPointTowardsHigherCheckpoint.x;
+                    checkPointY = checkpoints.get(i).furthestPointTowardsHigherCheckpoint.y;
+                    distance = distance(checkPointX, checkPointY, originX, originY);
+                    if (distance <= PATH_BUFFER_DISTANCE) {
+                        currentCheckpointIndex = i;
+                    }
+                }
+                if(checkpoints.get(i).furthestPointTowardsLowerCheckpoint != null){
+                    checkPointX = checkpoints.get(i).furthestPointTowardsLowerCheckpoint.x;
+                    checkPointY = checkpoints.get(i).furthestPointTowardsLowerCheckpoint.y;
+                    distance = distance(checkPointX, checkPointY, originX, originY);
+                    if (distance <= PATH_BUFFER_DISTANCE) {
+                        currentCheckpointIndex = i;
+                    }
+                }
+            }
+        }
+    }
+
 
     public float distance(Vector2 point1, Vector2 point2){
         return (float)Math.sqrt(Math.pow(point2.x - point1.x,2) + Math.pow(point2.y - point1.y,2));
@@ -574,10 +626,13 @@ public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProces
 
             Vector2 intersectPoint = new Vector2();
             Intersector.intersectSegments(playerRadiusPoint1, playerRadiusPoint2,checkPoints.get(currentCheckpointIndex).originVec,checkPoints.get(lastIndex).originVec,intersectPoint);
+
             float intersectDistance = distance(intersectPoint,checkPoints.get(lastIndex).originVec);
             float furthestPointDistance = distance(checkPoints.get(currentCheckpointIndex).furthestPointTowardsLowerCheckpoint,checkPoints.get(lastIndex).originVec);
             if(intersectDistance < furthestPointDistance){
-                checkPoints.get(currentCheckpointIndex).furthestPointTowardsLowerCheckpoint.set(intersectPoint);
+                if(intersectPoint.x != 0 || intersectPoint.y != 0) {
+                    checkPoints.get(currentCheckpointIndex).furthestPointTowardsLowerCheckpoint.set(intersectPoint);
+                }
             }
         }
 
@@ -612,7 +667,9 @@ public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProces
             float intersectDistance = distance(intersectPoint,checkPoints.get(nextIndex).originVec);
             float furthestPointDistance = distance(checkPoints.get(currentCheckpointIndex).furthestPointTowardsHigherCheckpoint,checkPoints.get(nextIndex).originVec);
             if(intersectDistance < furthestPointDistance){
-                checkPoints.get(currentCheckpointIndex).furthestPointTowardsHigherCheckpoint.set(intersectPoint);
+                if(intersectPoint.x != 0 || intersectPoint.y != 0) {
+                    checkPoints.get(currentCheckpointIndex).furthestPointTowardsHigherCheckpoint.set(intersectPoint);
+                }
             }
         }
     }
