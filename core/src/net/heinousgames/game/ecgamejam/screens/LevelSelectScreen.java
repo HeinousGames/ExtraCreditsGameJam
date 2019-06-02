@@ -30,7 +30,7 @@ public class LevelSelectScreen implements Screen {
 
         LevelSelectTable table1 = new LevelSelectTable(main, 1);
         LevelSelectTable table2 = new LevelSelectTable(main, 2);
-//        LevelSelectTable table3 = new LevelSelectTable(main, 3, "1_3", "1_2");
+        LevelSelectTable table3 = new LevelSelectTable(main, 3);
 //        LevelSelectTable table4 = new LevelSelectTable(main, 4, "1_4", "1_3");
 //        LevelSelectTable table5 = new LevelSelectTable(main, 5, "1_5", "1_4");
 //        LevelSelectTable table6 = new LevelSelectTable(main, 6, "1_6", "1_5");
@@ -43,7 +43,7 @@ public class LevelSelectScreen implements Screen {
         btnTable.setSize(960, 540);
         btnTable.add(table1);//.prefSize(128, 128);//.padRight(48);
         btnTable.add(table2);//.prefSize(128, 128);//.padLeft(48).row();
-//        btnTable.add(table3);
+        btnTable.add(table3);
 //        btnTable.add(table4);
 //        btnTable.add(table5).row();
 //

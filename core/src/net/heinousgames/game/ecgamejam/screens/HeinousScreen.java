@@ -42,8 +42,7 @@ public class HeinousScreen implements InputProcessor, Screen {
 
     public Animation<TextureRegion> characterWalking;
     public Array<Rectangle> tiles;
-    public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing,
-            upMemory, downMemory, leftMemory, rightMemory, displayLevelCompleteWindow;
+    public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing, displayLevelCompleteWindow;
     private float bgAlpha, wallLayerAlpha, stateTime;
     private float red, green, blue, colorCounter;
     private Image bg;
@@ -66,7 +65,6 @@ public class HeinousScreen implements InputProcessor, Screen {
     boolean win = false;
 
 
-    public float percentOfCurrentPath = 0;
 
     public HeinousScreen(Main main, int level) {
         this.main = main;
@@ -84,6 +82,9 @@ public class HeinousScreen implements InputProcessor, Screen {
         } else if (level == 2) {
             map = main.mapLoader.load("tiger.tmx");
             characterRect = new Rectangle(11, 2, (7/16f), (7/16f));
+        }else if(level == 3){
+            map = main.mapLoader.load("brain.tmx");
+            characterRect = new Rectangle(10, 10f, (7/16f), (7/16f));
         }
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 32f);
         worldWidth = map.getProperties().get("width", Integer.class);
@@ -618,25 +619,14 @@ public class HeinousScreen implements InputProcessor, Screen {
             if(currentCheckpointIndex == 0){
                 lastIndex = checkPoints.size -1;
             }
-            float deltaY = checkPoints.get(lastIndex).originY - checkPoints.get(currentCheckpointIndex).originY;
+            float deltaY = (checkPoints.get(currentCheckpointIndex).originX < checkPoints.get(lastIndex).originX) ?  checkPoints.get(lastIndex).originY - checkPoints.get(currentCheckpointIndex).originY :  checkPoints.get(currentCheckpointIndex).originY - checkPoints.get(lastIndex).originY;
+
             float deltaC = distance(checkPoints.get(currentCheckpointIndex).originX, checkPoints.get(currentCheckpointIndex).originY,checkPoints.get(lastIndex).originX,checkPoints.get(lastIndex).originY);
             float angleY = (float)(Math.asin((deltaY/deltaC)) * 180 / Math.PI);
             float playerPerpendicularAngle1 = (float)((angleY - 90) * Math.PI)/180f;
             float playerPerpendicularAngle2 = (float)((angleY + 90) * Math.PI)/180f;
             Vector2 playerRadiusPoint1 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle1)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle1)));
             Vector2 playerRadiusPoint2 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle2)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle2)));
-
-
-            debugRenderer.setProjectionMatrix(cameraGamePlay.combined);
-            debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-            debugRenderer.setColor(Color.GREEN);
-            debugRenderer.line(playerRadiusPoint1, playerRadiusPoint2);
-
-            debugRenderer.end();
-
-
-
             Vector2 intersectPoint = new Vector2();
             Intersector.intersectSegments(playerRadiusPoint1, playerRadiusPoint2,checkPoints.get(currentCheckpointIndex).originVec,checkPoints.get(lastIndex).originVec,intersectPoint);
 
@@ -662,26 +652,14 @@ public class HeinousScreen implements InputProcessor, Screen {
             if(currentCheckpointIndex == checkPoints.size -1){
                 nextIndex = 0;
             }
-            float deltaY = checkPoints.get(currentCheckpointIndex).originY - checkPoints.get(nextIndex).originY;
+
+            float deltaY = (checkPoints.get(currentCheckpointIndex).originX < checkPoints.get(nextIndex).originX) ?  checkPoints.get(nextIndex).originY - checkPoints.get(currentCheckpointIndex).originY :  checkPoints.get(currentCheckpointIndex).originY - checkPoints.get(nextIndex).originY;
             float deltaC = distance(checkPoints.get(currentCheckpointIndex).originVec, checkPoints.get(nextIndex).originVec);
             float angleY = (float)(Math.asin((deltaY/deltaC)) * 180 / Math.PI);
             float playerPerpendicularAngle1 = (float)((angleY - 90) * Math.PI)/180f;
             float playerPerpendicularAngle2 = (float)((angleY + 90) * Math.PI)/180f;
             Vector2 playerRadiusPoint1 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle1)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle1)));
             Vector2 playerRadiusPoint2 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle2)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle2)));
-
-
-            debugRenderer.setProjectionMatrix(cameraGamePlay.combined);
-            debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-            debugRenderer.setColor(Color.RED);
-            debugRenderer.line(playerRadiusPoint1, playerRadiusPoint2);
-
-            debugRenderer.end();
-
-
-
-
             Vector2 intersectPoint = new Vector2();
             Intersector.intersectSegments(playerRadiusPoint1, playerRadiusPoint2,checkPoints.get(currentCheckpointIndex).originVec,checkPoints.get(nextIndex).originVec,intersectPoint);
             float intersectDistance = distance(intersectPoint,checkPoints.get(nextIndex).originVec);
@@ -691,7 +669,7 @@ public class HeinousScreen implements InputProcessor, Screen {
                     checkPoints.get(currentCheckpointIndex).furthestPointTowardsHigherCheckpoint.set(intersectPoint);
 
                     distance = distance(checkPoints.get(currentCheckpointIndex).furthestPointTowardsHigherCheckpoint, checkPoints.get(nextIndex).furthestPointTowardsLowerCheckpoint);
-                    if(distance <= PATH_BUFFER_DISTANCE * .6f) {
+                    if(distance <= PATH_BUFFER_DISTANCE * .55f + MOVEMENT_SPEED) {
                         checkPoints.get(currentCheckpointIndex).connectedHigher = true;
                         checkPoints.get(nextIndex).connectedLower = true;
                         float[] tempPositions = {checkPoints.get(currentCheckpointIndex).originX, (checkPoints.get(currentCheckpointIndex).originY), checkPoints.get(nextIndex).originX, checkPoints.get(nextIndex).originY};

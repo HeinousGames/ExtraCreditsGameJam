@@ -21,6 +21,8 @@ public class LevelSelectTable extends Table {
                 button = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture("drawbridge1024.png"))));
             } else if (levelToLoad == 2) {
                 button = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture("tiger.png"))));
+            }if (levelToLoad == 3) {
+                button = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture("BrainBG.png"))));
             } else {
                 button = new ImageButton(main.stylePlay);
             }
