@@ -1,29 +1,30 @@
-package net.heinousgames.game.ecgamejam.windows;
+package net.heinousgames.game.ecgamejam;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import net.heinousgames.game.ecgamejam.Main;
 import net.heinousgames.game.ecgamejam.screens.HeinousScreen;
 import net.heinousgames.game.ecgamejam.screens.LevelSelectScreen;
 
-public class LevelFinishedStatusWindow extends BaseWindow {
+public class LevelFinishedStatusTable extends Table {
 
-    public LevelFinishedStatusWindow(final BaseWindowCallback callback, final Main main, /*WindowStyle windowStyle,*/ final int level) {
-        super(callback, main);
+    public LevelFinishedStatusTable(final Main main, final int level) {
 
-        TextureRegion exit = new TextureRegion(main.buttons, 128, 4000, 190, 190);
-        TextureRegion play = new TextureRegion(main.buttons, 128, 761, 190, 190);
+        setBackground(new TextureRegionDrawable(new TextureRegion(
+                main.windows, 1870, 2112, 770, 534)));
 
-        Image imgContinue = new Image(play);
-//        Image imgReplay = new Image(new Texture("replay.png"));
-        Image imgExit = new Image(exit);
+        ImageButton playButton = new ImageButton(main.stylePlay);
+        ImageButton exitButton = new ImageButton(main.styleExit);
 
-        imgContinue.addListener(new ClickListener() {
+        playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                main.buttonClick.play();
                 remove();
                 main.getScreen().dispose();
                 main.setScreen(new HeinousScreen(main,level+1));
@@ -37,19 +38,21 @@ public class LevelFinishedStatusWindow extends BaseWindow {
 //            }
 //        });
 
-        imgExit.addListener(new ClickListener() {
+        exitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                main.buttonClick.play();
                 remove();
                 main.getScreen().dispose();
                 main.setScreen(new LevelSelectScreen(main));
             }
         });
 
-        add(imgExit).prefSize(128, 128);
+        add(exitButton).size(120, 120).padRight(20);
 //        add(imgReplay).prefSize(128, 128);
-        add(imgContinue).prefSize(128, 128).row();
+        add(playButton).size(120, 120).padLeft(20).row();
 
+//        pack();
 //        debug();
     }
 
