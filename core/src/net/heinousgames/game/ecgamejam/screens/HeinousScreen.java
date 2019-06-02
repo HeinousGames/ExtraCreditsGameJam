@@ -619,16 +619,6 @@ public class HeinousScreen implements InputProcessor, Screen {
             Vector2 playerRadiusPoint2 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle2)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle2)));
 
 
-            main.shapeRenderer.setProjectionMatrix(cameraGamePlay.combined);
-            main.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-            main.shapeRenderer.setColor(Color.GREEN);
-            main.shapeRenderer.line(playerRadiusPoint1, playerRadiusPoint2);
-
-            main.shapeRenderer.end();
-
-
-
             Vector2 intersectPoint = new Vector2();
             Intersector.intersectSegments(playerRadiusPoint1, playerRadiusPoint2,checkPoints.get(currentCheckpointIndex).originVec,checkPoints.get(lastIndex).originVec,intersectPoint);
 
@@ -662,15 +652,6 @@ public class HeinousScreen implements InputProcessor, Screen {
             float playerPerpendicularAngle2 = (float)((angleY + 90) * Math.PI)/180f;
             Vector2 playerRadiusPoint1 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle1)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle1)));
             Vector2 playerRadiusPoint2 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle2)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle2)));
-
-
-            main.shapeRenderer.setProjectionMatrix(cameraGamePlay.combined);
-            main.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-            main.shapeRenderer.setColor(Color.RED);
-            main.shapeRenderer.line(playerRadiusPoint1, playerRadiusPoint2);
-
-            main.shapeRenderer.end();
 
 
 
