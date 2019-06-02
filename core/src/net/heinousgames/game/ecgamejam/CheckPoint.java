@@ -34,16 +34,12 @@ public class CheckPoint extends Image {
         super.draw(batch, parentAlpha);
 
         batch.end();
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         main.shapeRenderer.setColor(main.red, main.green, main.blue, 1);
         main.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        main.shapeRenderer.circle(originX, originY, 0.25f);//getX() + 0.5f, getY() + 0.5f, 0.25f);
+        main.shapeRenderer.circle(originX, originY, 0.25f, 8);//getX() + 0.5f, getY() + 0.5f, 0.25f);
         main.shapeRenderer.end();
 
-        Gdx.gl.glLineWidth(1f);
-        Gdx.gl.glDisable(GL20.GL_BLEND);
         batch.begin();
     }
 
