@@ -2,6 +2,7 @@ package net.heinousgames.game.ecgamejam.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -20,16 +21,20 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import net.heinousgames.game.ecgamejam.CheckPoint;
 import net.heinousgames.game.ecgamejam.Main;
+import net.heinousgames.game.ecgamejam.windows.BaseWindow;
+import net.heinousgames.game.ecgamejam.windows.LevelFinishedStatusWindow;
 
 import java.util.ArrayList;
 
-public class HeinousScreen implements Screen, InputProcessor {
+public class HeinousScreen implements BaseWindow.BaseWindowCallback, InputProcessor, Screen {
 
     private static final float COLOR_FREQUENCY = 0.21f;
     private static final float MOVEMENT_SPEED = .07f;
@@ -38,18 +43,19 @@ public class HeinousScreen implements Screen, InputProcessor {
     public Animation<TextureRegion> characterWalking;
     public Array<Rectangle> tiles;
     public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing,
-            upMemory, downMemory, leftMemory, rightMemory;
+            upMemory, downMemory, leftMemory, rightMemory, displayLevelCompleteWindow;
     private float bgAlpha, wallLayerAlpha, stateTime;
     private float red, green, blue, colorCounter;
     private Image bg;
-    private int worldWidth, worldHeight;
+    private int worldWidth, worldHeight, level;
     public Main main;
-    public OrthographicCamera cameraGamePlay;
+    public OrthographicCamera cameraGamePlay, cameraDialogs;
     public OrthogonalTiledMapRenderer renderer;
     public Pool<Rectangle> rectPool;
     public Rectangle characterRect;
     //public Circle characterCircle;
     public ShapeRenderer debugRenderer;
+    public Stage stageDialogs;
     public TextureRegion currentFrame, nonMovingFrame;
     public TiledMap map;
 
@@ -60,15 +66,20 @@ public class HeinousScreen implements Screen, InputProcessor {
 
     public float percentOfCurrentPath = 0;
 
-    public HeinousScreen(Main main, String mapFileName) {
+    public HeinousScreen(Main main, int level) {
         this.main = main;
+        this.level = level;
         bgAlpha = 0;
         bgAlphaIncreasing = true;
         wallLayerAlpha = 1;
         colorCounter = 0f;
         red = green = blue = 1;
         debugRenderer = new ShapeRenderer();
-        map = main.mapLoader.load(mapFileName);
+        if (level == 1) {
+            map = main.mapLoader.load("drawbridge.tmx");
+        } else if (level == 2) {
+            map = main.mapLoader.load("tiger.tmx");
+        }
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 32f);
         worldWidth = map.getProperties().get("width", Integer.class);
         worldHeight = map.getProperties().get("height", Integer.class);
@@ -108,9 +119,6 @@ public class HeinousScreen implements Screen, InputProcessor {
         };
         tiles = new Array<Rectangle>();
 
-        main.bgMusic = Gdx.audio.newMusic(Gdx.files.internal("Ceci Beats - Beach Daze.mp3"));
-        main.bgMusic.setLooping(true);
-
         Gdx.input.setInputProcessor(this);
 
         currentCheckpointIndex = 0;
@@ -130,14 +138,15 @@ public class HeinousScreen implements Screen, InputProcessor {
             }
         }
 
-//        for (int i = 0; i < checkPoints.size; i++) {
-//            System.out.println("Position: " + i + "\nX: " + checkPoints.get(i).getX() + "\nY: " + checkPoints.get(i).getY());
-//        }
+        cameraDialogs = new OrthographicCamera(854, 480);
+        stageDialogs = new Stage(new StretchViewport(854, 480, cameraDialogs));
     }
 
     @Override
     public void show() {
 //        main.bgMusic.play();
+        InputMultiplexer multiplexer = new InputMultiplexer(stageDialogs, this);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
@@ -159,6 +168,10 @@ public class HeinousScreen implements Screen, InputProcessor {
 //            } else if (bgAlpha <= 0) {
 //                bgAlphaIncreasing = true;
                 bgAlpha = 1;
+                if (!displayLevelCompleteWindow) {
+                    displayLevelCompleteWindow = true;
+                    stageDialogs.addActor(new LevelFinishedStatusWindow(this, main, level));
+                }
             }
 
             if (wallLayerAlpha <= 0) {
@@ -175,6 +188,7 @@ public class HeinousScreen implements Screen, InputProcessor {
         main.batch.end();
 
         cameraGamePlay.update();
+        cameraDialogs.update();
 
         renderer.setView(cameraGamePlay);
         renderer.getMap().getLayers().get("walls").setOpacity(wallLayerAlpha);
@@ -345,9 +359,13 @@ public class HeinousScreen implements Screen, InputProcessor {
         if (currentCheckpointIndex == checkPoints.size ||
                 foundPaths.size() == checkPoints.size) {
             holdingSpace = true;
+            main.prefs.putBoolean("level".concat(String.valueOf(level)), true).flush();
 //            dispose();
 //            main.setScreen(new HeinousScreen(main, "tiger.tmx"));
         }
+
+        stageDialogs.act();
+        stageDialogs.draw();
 
         //renderDebug();
     }
@@ -617,7 +635,7 @@ public class HeinousScreen implements Screen, InputProcessor {
 
     @Override
     public void hide() {
-        main.bgMusic.pause();
+//        main.bgMusic.pause();
     }
 
     @Override
@@ -721,5 +739,10 @@ public class HeinousScreen implements Screen, InputProcessor {
                 }
             }
         }
+    }
+
+    @Override
+    public void buttonClick(String key) {
+
     }
 }
