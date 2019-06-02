@@ -61,8 +61,6 @@ public class StartScreen implements Screen {
 
         main.batch.setProjectionMatrix(camera.combined);
 
-//        main.bgMusic.play();
-
 //        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("sfx/title_theme.mp3"));
 //        bgMusic.setLooping(true);
 //        bgMusic.play();
@@ -71,6 +69,9 @@ public class StartScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stageUI);
+        if (!main.bgMusic.isPlaying()) {
+            main.bgMusic.play();
+        }
     }
 
     @Override

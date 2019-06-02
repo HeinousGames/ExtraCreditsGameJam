@@ -64,6 +64,9 @@ public class LevelSelectScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stageUI);
+        if (!main.bgMusic.isPlaying()) {
+            main.bgMusic.play();
+        }
     }
 
     @Override

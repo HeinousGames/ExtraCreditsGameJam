@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -54,6 +55,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     public Rectangle characterRect;
     //public Circle characterCircle;
     public ShapeRenderer debugRenderer;
+    public Sound gameWin;
     public Stage stageDialogs;
     public TextureRegion currentFrame, nonMovingFrame;
     public TiledMap map;
@@ -68,6 +70,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     public HeinousScreen(Main main, int level) {
         this.main = main;
         this.level = level;
+        gameWin = Gdx.audio.newSound(Gdx.files.internal("game_win.mp3"));
         bgAlpha = 0;
         bgAlphaIncreasing = true;
         wallLayerAlpha = 1;
@@ -143,7 +146,9 @@ public class HeinousScreen implements InputProcessor, Screen {
 
     @Override
     public void show() {
-//        main.bgMusic.play();
+        if (!main.bgMusic.isPlaying()) {
+            main.bgMusic.play();
+        }
         InputMultiplexer multiplexer = new InputMultiplexer(stageDialogs, this);
         Gdx.input.setInputProcessor(multiplexer);
     }
@@ -361,6 +366,8 @@ public class HeinousScreen implements InputProcessor, Screen {
 
         if (currentCheckpointIndex == checkPoints.size ||
                 foundPaths.size() == checkPoints.size) {
+            main.bgMusic.pause();
+            gameWin.play();
             holdingSpace = true;
             main.prefs.putBoolean("level".concat(String.valueOf(level)), true).flush();
 //            dispose();
@@ -643,7 +650,7 @@ public class HeinousScreen implements InputProcessor, Screen {
 
     @Override
     public void dispose() {
-
+        gameWin.dispose();
     }
 
     @Override

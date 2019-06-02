@@ -68,6 +68,7 @@ public class Main extends Game {
 	@Override
 	public void dispose () {
 	    batch.dispose();
+	    buttonClick.dispose();
 	    bgMusic.dispose();
 
 	    bg.dispose();
