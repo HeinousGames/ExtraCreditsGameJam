@@ -8,6 +8,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -16,14 +17,17 @@ import net.heinousgames.game.ecgamejam.screens.StartScreen;
 
 public class Main extends Game {
 
+    private static final float COLOR_FREQUENCY = 0.21f;
+
+    public float red, green, blue, colorCounter;
     public ImageButton.ImageButtonStyle stylePlay, styleExit;
     public Music bgMusic;
 	public Preferences prefs;
-	public Sound buttonClick;
+    public ShapeRenderer shapeRenderer;
+    public Sound buttonClick;
 	public SpriteBatch batch;
-	Texture buttons;
+	Texture buttons, windows;
 	public Texture bg;
-	public Texture windows;
 	public TmxMapLoader mapLoader;
 
 	@Override
@@ -57,12 +61,21 @@ public class Main extends Game {
         styleExit.down = new TextureRegionDrawable(new TextureRegion(exitDown));
         styleExit.over = new TextureRegionDrawable(new TextureRegion(exitOver));
 
+        shapeRenderer = new ShapeRenderer();
+        colorCounter = 0f;
+        red = green = blue = 1;
+
         setScreen(new StartScreen(this));
 	}
 
 	@Override
 	public void render () {
 	    super.render();
+        red = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 0) * 127 + 128) / 255f;
+        green = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 2) * 127 + 128) / 255f;
+        blue = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 4) * 127 + 128) / 255f;
+
+        colorCounter += Gdx.graphics.getDeltaTime() * 11f;
 	}
 	
 	@Override
@@ -74,5 +87,7 @@ public class Main extends Game {
 	    bg.dispose();
 	    buttons.dispose();
 	    windows.dispose();
+
+	    shapeRenderer.dispose();
 	}
 }
