@@ -5,8 +5,11 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import net.heinousgames.game.ecgamejam.LevelSelectTable;
@@ -14,11 +17,11 @@ import net.heinousgames.game.ecgamejam.Main;
 
 public class LevelSelectScreen implements Screen {
 
-    private Main main;
+    private final Main main;
 //    private Music bgMusic;
     private Stage stageUI;
 
-    public LevelSelectScreen(Main main) {
+    public LevelSelectScreen(final Main main) {
         this.main = main;
 
         OrthographicCamera camera = new OrthographicCamera();
@@ -51,6 +54,20 @@ public class LevelSelectScreen implements Screen {
 //        btnTable.add(table10);
 
         stageUI.addActor(btnTable);
+
+        ImageButton exitButton = new ImageButton(main.styleExit);
+        exitButton.setBounds(0, 480, 60, 60);
+        exitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (event.getType() == InputEvent.Type.touchUp) {
+                    main.buttonClick.play();
+                    dispose();
+                    main.setScreen(new StartScreen(main));
+                }
+            }
+        });
+        stageUI.addActor(exitButton);
 
         main.batch.setProjectionMatrix(camera.combined);
 
