@@ -30,17 +30,9 @@ public class CheckPoint extends Image {
         furthestPointTowardsHigherCheckpoint = new Vector2(originX, originY);
     }
 
-    public void draw (Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
 
-        batch.end();
-
-        main.shapeRenderer.setColor(main.red, main.green, main.blue, 1);
-        main.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        main.shapeRenderer.circle(originX, originY, 0.25f, 8);//getX() + 0.5f, getY() + 0.5f, 0.25f);
-        main.shapeRenderer.end();
-
-        batch.begin();
+    public void draw() {
+        main.shapeRenderer.circle(originX, originY, 0.25f, 8);
     }
 
 }

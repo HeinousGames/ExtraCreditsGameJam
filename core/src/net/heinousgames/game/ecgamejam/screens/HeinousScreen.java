@@ -42,7 +42,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     public Animation<TextureRegion> characterWalking;
     public Array<Rectangle> tiles;
     public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing, displayLevelCompleteWindow;
-    private float bgAlpha, wallLayerAlpha, stateTime;
+    private float bgAlpha, wallLayerAlpha, pathAlpha, stateTime;
     private Image bg;
     private int worldWidth, worldHeight, level;
     public Main main;
@@ -70,6 +70,7 @@ public class HeinousScreen implements InputProcessor, Screen {
         bgAlpha = 0;
         bgAlphaIncreasing = true;
         wallLayerAlpha = 1;
+        pathAlpha =1;
 
         if (level == 1) {
             map = main.mapLoader.load("drawbridge.tmx");
@@ -186,6 +187,7 @@ public class HeinousScreen implements InputProcessor, Screen {
         } else {
             bgAlpha = 0;
             wallLayerAlpha = 1;
+            pathAlpha = 1;
             bgAlphaIncreasing = true;
         }
 
@@ -286,11 +288,6 @@ public class HeinousScreen implements InputProcessor, Screen {
         main.batch.setColor(main.batch.getColor().r, main.batch.getColor().g, main.batch.getColor().b, 1);
         main.batch.begin();
 
-        // uncomment to draw checkpoints
-        for (CheckPoint checkPoint : checkPoints) {
-            checkPoint.draw(main.batch, 1);
-        }
-
         if (goingUp) {
             main.batch.draw(currentFrame, characterRect.x, characterRect.y,
                     characterRect.width / 2f, characterRect.height / 2f,
@@ -317,7 +314,7 @@ public class HeinousScreen implements InputProcessor, Screen {
         main.shapeRenderer.setProjectionMatrix(cameraGamePlay.combined);
         main.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        main.shapeRenderer.setColor(main.red, main.green, main.blue, 1);
+        main.shapeRenderer.setColor(main.red, main.green, main.blue, pathAlpha);
 
         /*** goes with the sequential mode **
         for (int i = 0; i < currentCheckpointIndex; i++) {
@@ -353,6 +350,12 @@ public class HeinousScreen implements InputProcessor, Screen {
             if(cp.originVec.x != cp.furthestPointTowardsHigherCheckpoint.x || cp.originVec.y != cp.furthestPointTowardsHigherCheckpoint.y){
                 main.shapeRenderer.rectLine(cp.originVec,cp.furthestPointTowardsHigherCheckpoint,8/32f);
             }
+        }
+
+
+        // uncomment to draw checkpoints
+        for (CheckPoint checkPoint : checkPoints) {
+            checkPoint.draw();
         }
 
         main.shapeRenderer.end();
