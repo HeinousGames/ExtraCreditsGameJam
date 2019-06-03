@@ -23,14 +23,14 @@ public class Main extends Game {
     public AssetManager assetManager;
     public float red, green, blue;
     private float colorCounter;
-    public ImageButton.ImageButtonStyle stylePlay, styleExit;
+    public ImageButton.ImageButtonStyle stylePlay, styleExit, styleSettings, styleInfo;
     public Music bgMusic;
 	public Preferences prefs;
     public ShapeRenderer shapeRenderer;
     public Sound buttonClick;
 	public SpriteBatch batch;
-	Texture buttons, windows;
-	public Texture bg;
+	Texture windows;
+	public Texture bg, buttons;
 	public TmxMapLoader mapLoader;
 
 	@Override
@@ -46,13 +46,21 @@ public class Main extends Game {
         buttons = new Texture("Buttons.png");
         windows = new Texture("Windows.png");
 
-        TextureRegion exitUp = new TextureRegion(buttons, 128, 4000, 190, 190);
-        TextureRegion exitDown = new TextureRegion(buttons, 529, 4000, 190, 190);
-        TextureRegion exitOver = new TextureRegion(buttons, 320, 4000, 190, 190);
+        TextureRegion exitUp = new TextureRegion(buttons, 128, 2488, 190, 190);
+        TextureRegion exitDown = new TextureRegion(buttons, 529, 2488, 190, 190);
+        TextureRegion exitOver = new TextureRegion(buttons, 320, 2488, 190, 190);
 
         TextureRegion playUp = new TextureRegion(buttons, 128, 760, 190, 190);
         TextureRegion playDown = new TextureRegion(buttons, 529, 760, 190, 190);
         TextureRegion playOver = new TextureRegion(buttons, 320, 760, 190, 190);
+
+        TextureRegion settingsUp = new TextureRegion(buttons, 1040, 2920, 190, 190);
+        TextureRegion settingsDown = new TextureRegion(buttons, 1442, 2920, 190, 190);
+        TextureRegion settingsOver = new TextureRegion(buttons, 1233, 2920, 190, 190);
+
+        TextureRegion infoUp = new TextureRegion(buttons, 1040, 977, 190, 190);
+        TextureRegion infoDown = new TextureRegion(buttons, 1442, 977, 190, 190);
+        TextureRegion infoOver = new TextureRegion(buttons, 1233, 977, 190, 190);
 
         stylePlay = new ImageButton.ImageButtonStyle();
         stylePlay.up = new TextureRegionDrawable(new TextureRegion(playUp));
@@ -63,6 +71,16 @@ public class Main extends Game {
         styleExit.up = new TextureRegionDrawable(new TextureRegion(exitUp));
         styleExit.down = new TextureRegionDrawable(new TextureRegion(exitDown));
         styleExit.over = new TextureRegionDrawable(new TextureRegion(exitOver));
+
+        styleInfo = new ImageButton.ImageButtonStyle();
+        styleInfo.up = new TextureRegionDrawable(new TextureRegion(infoUp));
+        styleInfo.down = new TextureRegionDrawable(new TextureRegion(infoDown));
+        styleInfo.over = new TextureRegionDrawable(new TextureRegion(infoOver));
+
+        styleSettings = new ImageButton.ImageButtonStyle();
+        styleSettings.up = new TextureRegionDrawable(new TextureRegion(settingsUp));
+        styleSettings.down = new TextureRegionDrawable(new TextureRegion(settingsDown));
+        styleSettings.over = new TextureRegionDrawable(new TextureRegion(settingsOver));
 
         shapeRenderer = new ShapeRenderer();
         colorCounter = 0f;
@@ -85,7 +103,6 @@ public class Main extends Game {
 	    assetManager.dispose();
 	    batch.dispose();
 	    buttonClick.dispose();
-//	    bgMusic.dispose();
 
 	    bg.dispose();
 	    buttons.dispose();
