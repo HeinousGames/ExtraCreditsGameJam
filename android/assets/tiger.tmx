@@ -4,7 +4,7 @@
  <tileset firstgid="16" source="tiger.tsx"/>
  <tileset firstgid="17" source="maze_tiles.tsx"/>
  <objectgroup name="background">
-  <object id="5" name="bg" gid="16" x="0" y="1152" width="1216" height="1152"/>
+  <object id="5" name="bg" gid="16" x="1" y="1150" width="1216" height="1152"/>
  </objectgroup>
  <layer name="walls" width="38" height="36">
   <data encoding="csv">
@@ -57,12 +57,12 @@
     <property name="position" type="int" value="1"/>
    </properties>
   </object>
-  <object id="8" gid="24" x="368" y="1024" width="32" height="32">
+  <object id="8" gid="24" x="375" y="1018" width="32" height="32">
    <properties>
     <property name="position" type="int" value="2"/>
    </properties>
   </object>
-  <object id="12" gid="24" x="506.333" y="999.333" width="32" height="32">
+  <object id="12" gid="24" x="517.333" y="1018" width="32" height="32">
    <properties>
     <property name="position" type="int" value="3"/>
    </properties>
@@ -97,12 +97,12 @@
     <property name="position" type="int" value="9"/>
    </properties>
   </object>
-  <object id="23" gid="24" x="482" y="986" width="32" height="32">
+  <object id="23" gid="24" x="486" y="1004" width="32" height="32">
    <properties>
     <property name="position" type="int" value="10"/>
    </properties>
   </object>
-  <object id="24" gid="24" x="353" y="1004" width="32" height="32">
+  <object id="24" gid="24" x="367" y="1004" width="32" height="32">
    <properties>
     <property name="position" type="int" value="11"/>
    </properties>
@@ -212,17 +212,17 @@
     <property name="position" type="int" value="32"/>
    </properties>
   </object>
-  <object id="13" gid="24" x="705.333" y="1006.67" width="32" height="32">
+  <object id="13" gid="24" x="698.333" y="1019.67" width="32" height="32">
    <properties>
     <property name="position" type="int" value="33"/>
    </properties>
   </object>
-  <object id="62" gid="24" x="528.667" y="1011.33" width="32" height="32">
+  <object id="62" gid="24" x="530" y="1010" width="32" height="32">
    <properties>
     <property name="position" type="int" value="34"/>
    </properties>
   </object>
-  <object id="63" gid="24" x="698" y="1054" width="32" height="32">
+  <object id="63" gid="24" x="693" y="1031" width="32" height="32">
    <properties>
     <property name="position" type="int" value="35"/>
    </properties>
