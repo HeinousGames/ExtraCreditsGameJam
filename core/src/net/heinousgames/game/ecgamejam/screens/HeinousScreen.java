@@ -22,8 +22,11 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -50,7 +53,6 @@ public class HeinousScreen implements InputProcessor, Screen {
     public OrthogonalTiledMapRenderer renderer;
     public Pool<Rectangle> rectPool;
     public Rectangle characterRect;
-    //public Circle characterCircle;
     public Sound gameWin, lightUp;
     public Stage stageDialogs;
     public TextureRegion currentFrame, nonMovingFrame;
@@ -61,7 +63,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     public ArrayList<float[]> foundPaths = new ArrayList<float[]>();
     boolean win = false;
 
-    public HeinousScreen(Main main, int level) {
+    public HeinousScreen(final Main main, int level) {
         this.main = main;
         this.level = level;
         gameWin = Gdx.audio.newSound(Gdx.files.internal("game_win.mp3"));
@@ -76,7 +78,7 @@ public class HeinousScreen implements InputProcessor, Screen {
         } else if (level == 2) {
             map = main.mapLoader.load("tiger.tmx");
             characterRect = new Rectangle(16.65f, 1, (7/16f), (7/16f));
-        }else if(level == 3){
+        } else if (level == 3) {
             map = main.mapLoader.load("brain.tmx");
             characterRect = new Rectangle(10, 10f, (7/16f), (7/16f));
         }
@@ -103,12 +105,6 @@ public class HeinousScreen implements InputProcessor, Screen {
                 regions[0][2], regions[0][3], regions[0][4], regions[0][5], regions[0][6], regions[0][7]);
         characterWalking.setPlayMode(Animation.PlayMode.LOOP);
         nonMovingFrame = regions[0][0];
-
-        //characterX = 11;
-        //characterY = 4;
-
-        //characterRect = new Rectangle(characterX, characterY, 1, 1);
-        //characterCircle = new Circle(11, 4, (5/16f));
 
         rectPool = new Pool<Rectangle>() {
             @Override
@@ -139,6 +135,20 @@ public class HeinousScreen implements InputProcessor, Screen {
 
         cameraDialogs = new OrthographicCamera(854, 480);
         stageDialogs = new Stage(new StretchViewport(854, 480, cameraDialogs));
+
+        ImageButton exitButton = new ImageButton(main.styleExit);
+        exitButton.setBounds(2, 456, 20, 20);
+        exitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (event.getType() == InputEvent.Type.touchUp) {
+                    main.buttonClick.play();
+                    dispose();
+                    main.setScreen(new LevelSelectScreen(main));
+                }
+            }
+        });
+        stageDialogs.addActor(exitButton);
     }
 
     @Override
@@ -682,7 +692,7 @@ public class HeinousScreen implements InputProcessor, Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        stageDialogs.getViewport().update(width, height, true);
     }
 
     @Override
@@ -703,6 +713,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     @Override
     public void dispose() {
         gameWin.dispose();
+        lightUp.dispose();
     }
 
     @Override
