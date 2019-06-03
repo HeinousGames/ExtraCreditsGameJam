@@ -34,6 +34,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import net.heinousgames.game.ecgamejam.CheckPoint;
+import net.heinousgames.game.ecgamejam.Constants;
 import net.heinousgames.game.ecgamejam.Main;
 import net.heinousgames.game.ecgamejam.LevelFinishedStatusTable;
 
@@ -144,7 +145,9 @@ public class HeinousScreen implements InputProcessor, Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (event.getType() == InputEvent.Type.touchUp) {
-                    main.buttonClick.play();
+                    if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                        main.buttonClick.play();
+                    }
                     dispose();
                     main.setScreen(new LevelSelectScreen(main));
                 }
@@ -155,8 +158,10 @@ public class HeinousScreen implements InputProcessor, Screen {
 
     @Override
     public void show() {
-        if (!main.bgMusic.isPlaying()) {
-            main.bgMusic.play();
+        if (main.prefs.getBoolean(Constants.MUSIC_OPTION)) {
+            if (!main.bgMusic.isPlaying()) {
+                main.bgMusic.play();
+            }
         }
         InputMultiplexer multiplexer = new InputMultiplexer(stageDialogs, this);
         Gdx.input.setInputProcessor(multiplexer);
@@ -192,7 +197,9 @@ public class HeinousScreen implements InputProcessor, Screen {
                                     cameraDialogs.viewportHeight/2 - cameraDialogs.viewportHeight/4,
                                     cameraDialogs.viewportWidth/2, cameraDialogs.viewportHeight/2);
                             stageDialogs.addActor(window);
-                            main.bgMusic.play();
+                            if (main.prefs.getBoolean(Constants.MUSIC_OPTION)) {
+                                main.bgMusic.play();
+                            }
                             return false;
                         }
                     }));
@@ -378,8 +385,10 @@ public class HeinousScreen implements InputProcessor, Screen {
 
         if (foundPaths.size() == checkPoints.size && !win) {
             win = true;
-            main.bgMusic.pause();
-            gameWin.play();
+            if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                main.bgMusic.pause();
+                gameWin.play();
+            }
             holdingSpace = true;
             main.prefs.putBoolean("level".concat(String.valueOf(level)), true).flush();
         }
@@ -646,7 +655,9 @@ public class HeinousScreen implements InputProcessor, Screen {
                         checkPoints.get(lastIndex).connectedHigher = true;
                         float[] tempPositions = {checkPoints.get(currentCheckpointIndex).originX, (checkPoints.get(currentCheckpointIndex).originY), checkPoints.get(lastIndex).originX, checkPoints.get(lastIndex).originY};
                         foundPaths.add(tempPositions);
-                        lightUp.play();
+                        if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                            lightUp.play(0.1f);
+                        }
                     }
                 }
             }
@@ -681,7 +692,9 @@ public class HeinousScreen implements InputProcessor, Screen {
                         checkPoints.get(nextIndex).connectedLower = true;
                         float[] tempPositions = {checkPoints.get(currentCheckpointIndex).originX, (checkPoints.get(currentCheckpointIndex).originY), checkPoints.get(nextIndex).originX, checkPoints.get(nextIndex).originY};
                         foundPaths.add(tempPositions);
-                        lightUp.play();
+                        if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                            lightUp.play(0.1f);
+                        }
                     }
                 }
             }
