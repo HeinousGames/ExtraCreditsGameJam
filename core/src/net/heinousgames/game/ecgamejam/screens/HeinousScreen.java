@@ -51,7 +51,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     public Pool<Rectangle> rectPool;
     public Rectangle characterRect;
     //public Circle characterCircle;
-    public Sound gameWin;
+    public Sound gameWin, lightUp;
     public Stage stageDialogs;
     public TextureRegion currentFrame, nonMovingFrame;
     public TiledMap map;
@@ -61,12 +61,11 @@ public class HeinousScreen implements InputProcessor, Screen {
     public ArrayList<float[]> foundPaths = new ArrayList<float[]>();
     boolean win = false;
 
-
-
     public HeinousScreen(Main main, int level) {
         this.main = main;
         this.level = level;
         gameWin = Gdx.audio.newSound(Gdx.files.internal("game_win.mp3"));
+        lightUp = Gdx.audio.newSound(Gdx.files.internal("light_up.mp3"));
         bgAlpha = 0;
         bgAlphaIncreasing = true;
         wallLayerAlpha = 1;
@@ -636,6 +635,7 @@ public class HeinousScreen implements InputProcessor, Screen {
                         checkPoints.get(lastIndex).connectedHigher = true;
                         float[] tempPositions = {checkPoints.get(currentCheckpointIndex).originX, (checkPoints.get(currentCheckpointIndex).originY), checkPoints.get(lastIndex).originX, checkPoints.get(lastIndex).originY};
                         foundPaths.add(tempPositions);
+                        lightUp.play();
                     }
                 }
             }
@@ -656,9 +656,6 @@ public class HeinousScreen implements InputProcessor, Screen {
             Vector2 playerRadiusPoint1 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle1)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle1)));
             Vector2 playerRadiusPoint2 = new Vector2(originX + (PATH_BUFFER_DISTANCE * (float)Math.cos(playerPerpendicularAngle2)),originY + (PATH_BUFFER_DISTANCE * (float)Math.sin(playerPerpendicularAngle2)));
 
-
-
-
             Vector2 intersectPoint = new Vector2();
             Intersector.intersectSegments(playerRadiusPoint1, playerRadiusPoint2,checkPoints.get(currentCheckpointIndex).originVec,checkPoints.get(nextIndex).originVec,intersectPoint);
             float intersectDistance = distance(intersectPoint,checkPoints.get(nextIndex).originVec);
@@ -673,6 +670,7 @@ public class HeinousScreen implements InputProcessor, Screen {
                         checkPoints.get(nextIndex).connectedLower = true;
                         float[] tempPositions = {checkPoints.get(currentCheckpointIndex).originX, (checkPoints.get(currentCheckpointIndex).originY), checkPoints.get(nextIndex).originX, checkPoints.get(nextIndex).originY};
                         foundPaths.add(tempPositions);
+                        lightUp.play();
                     }
                 }
             }
