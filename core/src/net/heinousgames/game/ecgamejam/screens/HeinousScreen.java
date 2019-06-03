@@ -42,7 +42,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     public Animation<TextureRegion> characterWalking;
     public Array<Rectangle> tiles;
     public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing, displayLevelCompleteWindow;
-    private float bgAlpha, wallLayerAlpha, pathAlpha, stateTime;
+    private float bgAlpha, wallLayerAlpha, stateTime;
     private Image bg;
     private int worldWidth, worldHeight, level;
     public Main main;
@@ -70,7 +70,6 @@ public class HeinousScreen implements InputProcessor, Screen {
         bgAlpha = 0;
         bgAlphaIncreasing = true;
         wallLayerAlpha = 1;
-        pathAlpha =1;
 
         if (level == 1) {
             map = main.mapLoader.load("drawbridge.tmx");
@@ -175,8 +174,8 @@ public class HeinousScreen implements InputProcessor, Screen {
                     displayLevelCompleteWindow = true;
                     LevelFinishedStatusTable window = new LevelFinishedStatusTable(main, level);
                     window.setBounds(cameraDialogs.viewportWidth/2 - cameraDialogs.viewportWidth/4,
-                            cameraDialogs.viewportHeight/2 - cameraDialogs.viewportHeight/4
-                            , cameraDialogs.viewportWidth/2, cameraDialogs.viewportHeight/2);
+                            cameraDialogs.viewportHeight/2 - cameraDialogs.viewportHeight/4,
+                            cameraDialogs.viewportWidth/2, cameraDialogs.viewportHeight/2);
                     stageDialogs.addActor(window);
                 }
             }
@@ -187,7 +186,6 @@ public class HeinousScreen implements InputProcessor, Screen {
         } else {
             bgAlpha = 0;
             wallLayerAlpha = 1;
-            pathAlpha = 1;
             bgAlphaIncreasing = true;
         }
 
@@ -311,10 +309,11 @@ public class HeinousScreen implements InputProcessor, Screen {
         }
         main.batch.end();
 
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         main.shapeRenderer.setProjectionMatrix(cameraGamePlay.combined);
+        main.shapeRenderer.setColor(main.red, main.green, main.blue, wallLayerAlpha);
         main.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        main.shapeRenderer.setColor(main.red, main.green, main.blue, pathAlpha);
 
         /*** goes with the sequential mode **
         for (int i = 0; i < currentCheckpointIndex; i++) {
@@ -359,6 +358,7 @@ public class HeinousScreen implements InputProcessor, Screen {
         }
 
         main.shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         if (foundPaths.size() == checkPoints.size && !win) {
             win = true;
