@@ -36,8 +36,8 @@ import java.util.ArrayList;
 
 public class HeinousScreen implements InputProcessor, Screen {
 
-    private static final float MOVEMENT_SPEED = .11f;
-    private static final float PATH_BUFFER_DISTANCE = .5f;
+    private static final float MOVEMENT_SPEED = .085f;
+    private static final float PATH_BUFFER_DISTANCE = .6f;
 
     public Animation<TextureRegion> characterWalking;
     public Array<Rectangle> tiles;
@@ -75,7 +75,7 @@ public class HeinousScreen implements InputProcessor, Screen {
             characterRect = new Rectangle(1, 32.5f, (7/16f), (7/16f));
         } else if (level == 2) {
             map = main.mapLoader.load("tiger.tmx");
-            characterRect = new Rectangle(11, 2, (7/16f), (7/16f));
+            characterRect = new Rectangle(16.65f, 1, (7/16f), (7/16f));
         }else if(level == 3){
             map = main.mapLoader.load("brain.tmx");
             characterRect = new Rectangle(10, 10f, (7/16f), (7/16f));
@@ -280,33 +280,6 @@ public class HeinousScreen implements InputProcessor, Screen {
 
         addToPaths(characterRect, checkPoints);
 
-        stateTime += delta;
-        currentFrame = characterWalking.getKeyFrame(stateTime);
-        main.batch.setColor(main.batch.getColor().r, main.batch.getColor().g, main.batch.getColor().b, 1);
-        main.batch.begin();
-
-        if (goingUp) {
-            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
-                    characterRect.width / 2f, characterRect.height / 2f,
-                    characterRect.width, characterRect.height, 1, 1, 0);
-        } else if (goingDown) {
-            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
-                    characterRect.width / 2f, characterRect.height / 2f,
-                    characterRect.width, characterRect.height, 1, 1, 180);
-        } else if (goingLeft) {
-            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
-                    characterRect.width / 2f, characterRect.height / 2f,
-                    characterRect.width, characterRect.height, 1, 1, 270);
-        } else if (goingRight) {
-            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
-                    characterRect.width / 2f, characterRect.height / 2f,
-                    characterRect.width, characterRect.height, 1, 1, 90);
-        } else {
-            main.batch.draw(nonMovingFrame, characterRect.x, characterRect.y,
-                    characterRect.width / 2f, characterRect.height / 2f,
-                    characterRect.width, characterRect.height, 1, 1, 0);
-        }
-        main.batch.end();
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -358,6 +331,35 @@ public class HeinousScreen implements InputProcessor, Screen {
 
         main.shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
+
+
+        stateTime += delta;
+        currentFrame = characterWalking.getKeyFrame(stateTime);
+        main.batch.setColor(main.batch.getColor().r, main.batch.getColor().g, main.batch.getColor().b, 1);
+        main.batch.begin();
+
+        if (goingUp) {
+            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 0);
+        } else if (goingDown) {
+            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 180);
+        } else if (goingLeft) {
+            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 270);
+        } else if (goingRight) {
+            main.batch.draw(currentFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 90);
+        } else {
+            main.batch.draw(nonMovingFrame, characterRect.x, characterRect.y,
+                    characterRect.width / 2f, characterRect.height / 2f,
+                    characterRect.width, characterRect.height, 1, 1, 0);
+        }
+        main.batch.end();
 
         if (foundPaths.size() == checkPoints.size && !win) {
             win = true;
@@ -746,9 +748,11 @@ public class HeinousScreen implements InputProcessor, Screen {
         }
 
         if (keycode == Input.Keys.SPACE) {
+            /*
             holdingSpace = false;
             win = false;
             bgAlpha = 0;
+            */
         }
         return false;
     }
