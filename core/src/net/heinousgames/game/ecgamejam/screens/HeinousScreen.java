@@ -656,7 +656,7 @@ public class HeinousScreen implements InputProcessor, Screen {
                         float[] tempPositions = {checkPoints.get(currentCheckpointIndex).originX, (checkPoints.get(currentCheckpointIndex).originY), checkPoints.get(lastIndex).originX, checkPoints.get(lastIndex).originY};
                         foundPaths.add(tempPositions);
                         if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
-                            lightUp.play(0.1f);
+                            lightUp.play(0.2f);
                         }
                     }
                 }
@@ -693,7 +693,7 @@ public class HeinousScreen implements InputProcessor, Screen {
                         float[] tempPositions = {checkPoints.get(currentCheckpointIndex).originX, (checkPoints.get(currentCheckpointIndex).originY), checkPoints.get(nextIndex).originX, checkPoints.get(nextIndex).originY};
                         foundPaths.add(tempPositions);
                         if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
-                            lightUp.play(0.1f);
+                            lightUp.play(0.2f);
                         }
                     }
                 }
