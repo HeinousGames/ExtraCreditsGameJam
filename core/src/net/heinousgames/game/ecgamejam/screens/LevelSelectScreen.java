@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
+import net.heinousgames.game.ecgamejam.Constants;
 import net.heinousgames.game.ecgamejam.LevelSelectTable;
 import net.heinousgames.game.ecgamejam.Main;
 
@@ -29,27 +30,12 @@ public class LevelSelectScreen implements Screen {
         LevelSelectTable table1 = new LevelSelectTable(main, 1);
         LevelSelectTable table2 = new LevelSelectTable(main, 2);
         LevelSelectTable table3 = new LevelSelectTable(main, 3);
-//        LevelSelectTable table4 = new LevelSelectTable(main, 4, "1_4", "1_3");
-//        LevelSelectTable table5 = new LevelSelectTable(main, 5, "1_5", "1_4");
-//        LevelSelectTable table6 = new LevelSelectTable(main, 6, "1_6", "1_5");
-//        LevelSelectTable table7 = new LevelSelectTable(main, 7, "1_7", "1_6");
-//        LevelSelectTable table8 = new LevelSelectTable(main, 8, "1_8", "1_7");
-//        LevelSelectTable table9 = new LevelSelectTable(main, 9, "1_9", "1_8");
-//        LevelSelectTable table10 = new LevelSelectTable(main, 10, "1_10", "1_9");
 
         Table btnTable = new Table();
         btnTable.setSize(960, 540);
         btnTable.add(table1);//.prefSize(128, 128);//.padRight(48);
         btnTable.add(table2);//.prefSize(128, 128);//.padLeft(48).row();
         btnTable.add(table3);
-//        btnTable.add(table4);
-//        btnTable.add(table5).row();
-//
-//        btnTable.add(table6);
-//        btnTable.add(table7);
-//        btnTable.add(table8);
-//        btnTable.add(table9);
-//        btnTable.add(table10);
 
         stageUI.addActor(btnTable);
 
@@ -59,7 +45,9 @@ public class LevelSelectScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (event.getType() == InputEvent.Type.touchUp) {
-                    main.buttonClick.play();
+                    if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                        main.buttonClick.play();
+                    }
                     dispose();
                     main.setScreen(new StartScreen(main));
                 }
@@ -75,8 +63,10 @@ public class LevelSelectScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stageUI);
-        if (!main.bgMusic.isPlaying()) {
-            main.bgMusic.play();
+        if (main.prefs.getBoolean(Constants.MUSIC_OPTION)) {
+            if (!main.bgMusic.isPlaying()) {
+                main.bgMusic.play();
+            }
         }
     }
 

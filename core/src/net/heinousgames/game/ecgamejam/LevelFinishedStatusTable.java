@@ -24,7 +24,9 @@ public class LevelFinishedStatusTable extends Table {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                main.buttonClick.play();
+                if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                    main.buttonClick.play();
+                }
                 remove();
                 main.getScreen().dispose();
                 main.setScreen(new HeinousScreen(main,level+1));
@@ -41,7 +43,9 @@ public class LevelFinishedStatusTable extends Table {
         exitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                main.buttonClick.play();
+                if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                    main.buttonClick.play();
+                }
                 remove();
                 main.getScreen().dispose();
                 main.setScreen(new LevelSelectScreen(main));

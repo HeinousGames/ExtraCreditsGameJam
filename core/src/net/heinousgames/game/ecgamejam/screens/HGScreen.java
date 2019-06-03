@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Timer;
 
+import net.heinousgames.game.ecgamejam.Constants;
 import net.heinousgames.game.ecgamejam.Main;
 
 /**
@@ -49,7 +50,9 @@ public class HGScreen implements Screen {
                 timerSet = true;
                 main.bgMusic = main.assetManager.get("Ceci Beats - Beach Daze.mp3", Music.class);
                 main.bgMusic.setLooping(true);
-                main.bgMusic.play();
+                if (main.prefs.getBoolean(Constants.MUSIC_OPTION)) {
+                    main.bgMusic.play();
+                }
                 Timer.schedule(new Timer.Task() {
                     @Override
                     public void run() {

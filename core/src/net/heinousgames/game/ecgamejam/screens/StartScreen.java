@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
+import net.heinousgames.game.ecgamejam.Constants;
 import net.heinousgames.game.ecgamejam.Main;
 
 public class StartScreen implements Screen {
@@ -33,14 +34,31 @@ public class StartScreen implements Screen {
         Gdx.input.setInputProcessor(stageUI);
 
         ImageButton playButton = new ImageButton(main.stylePlay);
-        ImageButton exitButton = new ImageButton(main.styleExit);
+        ImageButton settingsButton = new ImageButton(main.styleSettings);
+        ImageButton infoButton = new ImageButton(main.styleInfo);
 
-        exitButton.addListener(new ClickListener() {
+        infoButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (event.getType() == InputEvent.Type.touchUp) {
-                    main.buttonClick.play();
-                    Gdx.app.exit();
+                    if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                        main.buttonClick.play();
+                    }
+                    main.setScreen(new InfoScreen(main));
+                    dispose();
+                }
+            }
+        });
+
+        settingsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (event.getType() == InputEvent.Type.touchUp) {
+                    if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                        main.buttonClick.play();
+                    }
+                    main.setScreen(new SettingsScreen(main));
+                    dispose();
                 }
             }
         });
@@ -49,7 +67,9 @@ public class StartScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (event.getType() == InputEvent.Type.touchUp) {
-                    main.buttonClick.play();
+                    if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                        main.buttonClick.play();
+                    }
                     main.setScreen(new LevelSelectScreen(main));
                     dispose();
                 }
@@ -58,9 +78,10 @@ public class StartScreen implements Screen {
 
         Table btnTable = new Table();
         btnTable.setSize(960, 540);
-        btnTable.add(imgTitle).row();
-//        btnTable.add(exitButton).prefSize(190, 190).padRight(48);
-        btnTable.add(playButton).prefSize(190, 190).row();
+        btnTable.add(imgTitle).colspan(3).row();
+        btnTable.add(playButton).prefSize(190, 190).padRight(24);
+        btnTable.add(settingsButton).prefSize(190, 190).padLeft(24).padRight(24);
+        btnTable.add(infoButton).prefSize(190, 190).padLeft(24);
 
         stageUI.addActor(btnTable);
 
@@ -70,8 +91,10 @@ public class StartScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stageUI);
-        if (!main.bgMusic.isPlaying()) {
-            main.bgMusic.play();
+        if (main.prefs.getBoolean(Constants.MUSIC_OPTION)) {
+            if (!main.bgMusic.isPlaying()) {
+                main.bgMusic.play();
+            }
         }
     }
 

@@ -30,7 +30,9 @@ public class LevelSelectTable extends Table {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     if (event.getType() == InputEvent.Type.touchUp) {
-                        main.buttonClick.play();
+                        if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                            main.buttonClick.play();
+                        }
                         main.getScreen().dispose();
                         main.setScreen(new HeinousScreen(main, levelToLoad));
                     }
@@ -43,7 +45,9 @@ public class LevelSelectTable extends Table {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         if (event.getType() == InputEvent.Type.touchUp) {
-                            main.buttonClick.play();
+                            if (main.prefs.getBoolean(Constants.SFX_OPTION)) {
+                                main.buttonClick.play();
+                            }
                             main.getScreen().dispose();
                             main.setScreen(new HeinousScreen(main, levelToLoad));
                         }
