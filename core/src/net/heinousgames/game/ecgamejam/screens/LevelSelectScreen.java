@@ -2,7 +2,6 @@ package net.heinousgames.game.ecgamejam.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,7 +17,6 @@ import net.heinousgames.game.ecgamejam.Main;
 public class LevelSelectScreen implements Screen {
 
     private final Main main;
-//    private Music bgMusic;
     private Stage stageUI;
 
     public LevelSelectScreen(final Main main) {
@@ -72,10 +70,6 @@ public class LevelSelectScreen implements Screen {
         main.batch.setProjectionMatrix(camera.combined);
 
 //        btnTable.debug();
-
-//        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("sfx/select_screen.mp3"));
-//        bgMusic.setLooping(true);
-//        bgMusic.play();
     }
 
     @Override
@@ -95,14 +89,13 @@ public class LevelSelectScreen implements Screen {
         main.batch.draw(main.bg, 0, 0);
         main.batch.end();
 
-//        stageUI.getViewport().apply();
         stageUI.act();
         stageUI.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-
+        stageUI.getViewport().update(width, height, true);
     }
 
     @Override
@@ -123,6 +116,5 @@ public class LevelSelectScreen implements Screen {
     @Override
     public void dispose() {
         stageUI.dispose();
-//        bgMusic.dispose();
     }
 }

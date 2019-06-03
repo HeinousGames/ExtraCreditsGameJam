@@ -3,6 +3,7 @@ package net.heinousgames.game.ecgamejam;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,13 +14,15 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-import net.heinousgames.game.ecgamejam.screens.StartScreen;
+import net.heinousgames.game.ecgamejam.screens.HGScreen;
 
 public class Main extends Game {
 
     private static final float COLOR_FREQUENCY = 0.21f;
 
-    public float red, green, blue, colorCounter;
+    public AssetManager assetManager;
+    public float red, green, blue;
+    private float colorCounter;
     public ImageButton.ImageButtonStyle stylePlay, styleExit;
     public Music bgMusic;
 	public Preferences prefs;
@@ -32,12 +35,12 @@ public class Main extends Game {
 
 	@Override
 	public void create () {
+        assetManager = new AssetManager();
+        assetManager.load("Ceci Beats - Beach Daze.mp3", Music.class);
         batch = new SpriteBatch();
         mapLoader = new TmxMapLoader();
         prefs = Gdx.app.getPreferences("ExtraCreditsGameJamSave");
         buttonClick = Gdx.audio.newSound(Gdx.files.internal("button_click.mp3"));
-        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("Ceci Beats - Beach Daze.mp3"));
-        bgMusic.setLooping(true);
 
         bg = new Texture("BG.png");
         buttons = new Texture("Buttons.png");
@@ -65,7 +68,7 @@ public class Main extends Game {
         colorCounter = 0f;
         red = green = blue = 1;
 
-        setScreen(new StartScreen(this));
+        setScreen(new HGScreen(this));
 	}
 
 	@Override
@@ -74,15 +77,15 @@ public class Main extends Game {
         red = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 0) * 127 + 128) / 255f;
         green = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 2) * 127 + 128) / 255f;
         blue = (float) (Math.sin(COLOR_FREQUENCY * colorCounter + 4) * 127 + 128) / 255f;
-
         colorCounter += Gdx.graphics.getDeltaTime() * 11f;
-	}
+    }
 	
 	@Override
 	public void dispose () {
+	    assetManager.dispose();
 	    batch.dispose();
 	    buttonClick.dispose();
-	    bgMusic.dispose();
+//	    bgMusic.dispose();
 
 	    bg.dispose();
 	    buttons.dispose();
