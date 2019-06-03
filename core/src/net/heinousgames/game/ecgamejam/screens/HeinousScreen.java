@@ -46,11 +46,14 @@ public class HeinousScreen implements InputProcessor, Screen {
     private static final float PATH_BUFFER_DISTANCE = .6f;
 
     private Animation<TextureRegion> characterWalking;
+    private Array<CheckPoint> checkPoints;
     private Array<Rectangle> tiles;
-    private boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing, displayLevelCompleteWindow;
+    private ArrayList<float[]> foundPaths = new ArrayList<float[]>();
+    private boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing,
+            displayLevelCompleteWindow, win;
     private float bgAlpha, wallLayerAlpha, stateTime;
     private Image bg;
-    private int level;
+    private int currentCheckpointIndex, level;
     public Main main;
     private OrthographicCamera cameraGamePlay, cameraDialogs;
     private OrthogonalTiledMapRenderer renderer;
@@ -60,11 +63,6 @@ public class HeinousScreen implements InputProcessor, Screen {
     private Stage stageDialogs;
     private TextureRegion nonMovingFrame;
     private TiledMap map;
-
-    private int currentCheckpointIndex;
-    private Array<CheckPoint> checkPoints;
-    private ArrayList<float[]> foundPaths = new ArrayList<float[]>();
-    private boolean win;
 
     public HeinousScreen(final Main main, int level) {
         this.main = main;
@@ -176,15 +174,9 @@ public class HeinousScreen implements InputProcessor, Screen {
             if (bgAlphaIncreasing) {
                 bgAlpha += 0.0075f;
                 wallLayerAlpha -= 0.0075f;
-//            } else {
-//                bgAlpha -= 0.005f;
-//                wallLayerAlpha += 0.005f;
             }
 
             if (bgAlpha >= 1) {
-//                bgAlphaIncreasing = false;
-//            } else if (bgAlpha <= 0) {
-//                bgAlphaIncreasing = true;
                 bgAlpha = 1;
                 if (!displayLevelCompleteWindow) {
                     displayLevelCompleteWindow = true;
