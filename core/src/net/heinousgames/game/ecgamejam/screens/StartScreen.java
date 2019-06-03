@@ -2,11 +2,12 @@ package net.heinousgames.game.ecgamejam.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -17,11 +18,14 @@ import net.heinousgames.game.ecgamejam.Main;
 public class StartScreen implements Screen {
 
     private Main main;
-//    private Music bgMusic;
     private Stage stageUI;
+    private Texture gameTitle;
 
-    public StartScreen(final Main main) {
+    StartScreen(final Main main) {
         this.main = main;
+
+        gameTitle = new Texture("cool_logo.png");
+        Image imgTitle = new Image(gameTitle);
 
         OrthographicCamera camera = new OrthographicCamera();
 
@@ -54,16 +58,13 @@ public class StartScreen implements Screen {
 
         Table btnTable = new Table();
         btnTable.setSize(960, 540);
-        btnTable.add(exitButton).prefSize(190, 190).padRight(48);
-        btnTable.add(playButton).prefSize(190, 190).padLeft(48).row();
+        btnTable.add(imgTitle).row();
+//        btnTable.add(exitButton).prefSize(190, 190).padRight(48);
+        btnTable.add(playButton).prefSize(190, 190).row();
 
         stageUI.addActor(btnTable);
 
         main.batch.setProjectionMatrix(camera.combined);
-
-//        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("sfx/title_theme.mp3"));
-//        bgMusic.setLooping(true);
-//        bgMusic.play();
     }
 
     @Override
@@ -89,7 +90,7 @@ public class StartScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        stageUI.getViewport().update(width, height, true);
     }
 
     @Override
@@ -110,6 +111,6 @@ public class StartScreen implements Screen {
     @Override
     public void dispose() {
         stageUI.dispose();
-//        bgMusic.dispose();
+        gameTitle.dispose();
     }
 }
