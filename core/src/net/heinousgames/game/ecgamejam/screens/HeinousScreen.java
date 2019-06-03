@@ -6,7 +6,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
+//import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,8 +22,10 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -42,26 +44,26 @@ public class HeinousScreen implements InputProcessor, Screen {
     private static final float MOVEMENT_SPEED = .085f;
     private static final float PATH_BUFFER_DISTANCE = .6f;
 
-    public Animation<TextureRegion> characterWalking;
-    public Array<Rectangle> tiles;
-    public boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing, displayLevelCompleteWindow;
+    private Animation<TextureRegion> characterWalking;
+    private Array<Rectangle> tiles;
+    private boolean goingUp, goingDown, goingLeft, goingRight, holdingSpace, bgAlphaIncreasing, displayLevelCompleteWindow;
     private float bgAlpha, wallLayerAlpha, stateTime;
     private Image bg;
-    private int worldWidth, worldHeight, level;
+    private int level;
     public Main main;
-    public OrthographicCamera cameraGamePlay, cameraDialogs;
-    public OrthogonalTiledMapRenderer renderer;
-    public Pool<Rectangle> rectPool;
-    public Rectangle characterRect;
-    public Sound gameWin, lightUp;
-    public Stage stageDialogs;
-    public TextureRegion currentFrame, nonMovingFrame;
-    public TiledMap map;
+    private OrthographicCamera cameraGamePlay, cameraDialogs;
+    private OrthogonalTiledMapRenderer renderer;
+    private Pool<Rectangle> rectPool;
+    private Rectangle characterRect;
+    private Sound gameWin, lightUp;
+    private Stage stageDialogs;
+    private TextureRegion nonMovingFrame;
+    private TiledMap map;
 
-    public int currentCheckpointIndex;
-    public Array<CheckPoint> checkPoints;
-    public ArrayList<float[]> foundPaths = new ArrayList<float[]>();
-    boolean win = false;
+    private int currentCheckpointIndex;
+    private Array<CheckPoint> checkPoints;
+    private ArrayList<float[]> foundPaths = new ArrayList<float[]>();
+    private boolean win;
 
     public HeinousScreen(final Main main, int level) {
         this.main = main;
@@ -83,8 +85,8 @@ public class HeinousScreen implements InputProcessor, Screen {
             characterRect = new Rectangle(10, 10f, (7/16f), (7/16f));
         }
         renderer = new OrthogonalTiledMapRenderer(map, 1 / 32f);
-        worldWidth = map.getProperties().get("width", Integer.class);
-        worldHeight = map.getProperties().get("height", Integer.class);
+        int worldWidth = map.getProperties().get("width", Integer.class);
+        int worldHeight = map.getProperties().get("height", Integer.class);
         cameraGamePlay = new OrthographicCamera();
         cameraGamePlay.setToOrtho(false, worldWidth, worldHeight);
         cameraGamePlay.position.set(worldWidth / 2f, worldHeight / 2f, 0);
@@ -167,8 +169,8 @@ public class HeinousScreen implements InputProcessor, Screen {
 
         if (holdingSpace) {
             if (bgAlphaIncreasing) {
-                bgAlpha += 0.005f;
-                wallLayerAlpha -= 0.005f;
+                bgAlpha += 0.0075f;
+                wallLayerAlpha -= 0.0075f;
 //            } else {
 //                bgAlpha -= 0.005f;
 //                wallLayerAlpha += 0.005f;
@@ -181,11 +183,19 @@ public class HeinousScreen implements InputProcessor, Screen {
                 bgAlpha = 1;
                 if (!displayLevelCompleteWindow) {
                     displayLevelCompleteWindow = true;
-                    LevelFinishedStatusTable window = new LevelFinishedStatusTable(main, level);
-                    window.setBounds(cameraDialogs.viewportWidth/2 - cameraDialogs.viewportWidth/4,
-                            cameraDialogs.viewportHeight/2 - cameraDialogs.viewportHeight/4,
-                            cameraDialogs.viewportWidth/2, cameraDialogs.viewportHeight/2);
-                    stageDialogs.addActor(window);
+                    stageDialogs.addAction(Actions.sequence(Actions.delay(2),
+                            new Action() {
+                        @Override
+                        public boolean act(float delta) {
+                            LevelFinishedStatusTable window = new LevelFinishedStatusTable(main, level);
+                            window.setBounds(cameraDialogs.viewportWidth/2 - cameraDialogs.viewportWidth/4,
+                                    cameraDialogs.viewportHeight/2 - cameraDialogs.viewportHeight/4,
+                                    cameraDialogs.viewportWidth/2, cameraDialogs.viewportHeight/2);
+                            stageDialogs.addActor(window);
+                            main.bgMusic.play();
+                            return false;
+                        }
+                    }));
                 }
             }
 
@@ -240,7 +250,7 @@ public class HeinousScreen implements InputProcessor, Screen {
         float velocityXplaceHolder = velocity.x;
 
         // check regular walls
-        getTiles(startX, startY, endX, endY, tiles, "walls", rectPool);
+        getTiles(startX, startY, endX, endY, tiles, rectPool);
         for (Rectangle tile : tiles) {
             if (huskyRect.overlaps(tile)) {
                 velocity.x = 0;
@@ -263,10 +273,10 @@ public class HeinousScreen implements InputProcessor, Screen {
         startX = (int) (huskyRect.x);
         endX = (int) (huskyRect.x + huskyRect.getWidth());
         huskyRect.y += velocity.y;
-        float velocityYplaceHolder = velocity.y;
+//        float velocityYplaceHolder = velocity.y;
 
         // check regular walls
-        getTiles(startX, startY, endX, endY, tiles, "walls", rectPool);
+        getTiles(startX, startY, endX, endY, tiles, rectPool);
         for (Rectangle tile : tiles) {
             if (huskyRect.overlaps(tile)) {
                 // we actually reset the husky y-position here
@@ -297,7 +307,7 @@ public class HeinousScreen implements InputProcessor, Screen {
         main.shapeRenderer.setColor(main.red, main.green, main.blue, wallLayerAlpha);
         main.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        /*** goes with the sequential mode **
+        /* goes with the sequential mode *
         for (int i = 0; i < currentCheckpointIndex; i++) {
             if (i != checkPoints.size - 1) {
                 float checkPoint1X = (checkPoints.get(i).getX() + checkPoints.get(i).getX() + checkPoints.get(i).getWidth()) / 2f;
@@ -317,9 +327,9 @@ public class HeinousScreen implements InputProcessor, Screen {
             float checkPoint2Y = (checkPoints.get(size-1).getY() + checkPoints.get(size-1).getY() + checkPoints.get(size-1).getHeight())/2f;
 
             main.shapeRenderer.rectLine(new Vector2(checkPoint1X,checkPoint1Y),new Vector2(checkPoint2X,checkPoint2Y),8/32f);
-        }**/
+        }*/
 
-        /*** goes with the more liberal option where you can gather path sections out of sequence ***/
+        /* goes with the more liberal option where you can gather path sections out of sequence */
         for (float[] positions: foundPaths) {
             main.shapeRenderer.rectLine(new Vector2(positions[0],positions[1]),new Vector2(positions[2],positions[3]),8/32f);
         }
@@ -331,20 +341,15 @@ public class HeinousScreen implements InputProcessor, Screen {
             if(cp.originVec.x != cp.furthestPointTowardsHigherCheckpoint.x || cp.originVec.y != cp.furthestPointTowardsHigherCheckpoint.y){
                 main.shapeRenderer.rectLine(cp.originVec,cp.furthestPointTowardsHigherCheckpoint,8/32f);
             }
-        }
 
-
-        // uncomment to draw checkpoints
-        for (CheckPoint checkPoint : checkPoints) {
-            checkPoint.draw();
+            cp.draw();
         }
 
         main.shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-
         stateTime += delta;
-        currentFrame = characterWalking.getKeyFrame(stateTime);
+        TextureRegion currentFrame = characterWalking.getKeyFrame(stateTime);
         main.batch.setColor(main.batch.getColor().r, main.batch.getColor().g, main.batch.getColor().b, 1);
         main.batch.begin();
 
@@ -377,8 +382,6 @@ public class HeinousScreen implements InputProcessor, Screen {
             gameWin.play();
             holdingSpace = true;
             main.prefs.putBoolean("level".concat(String.valueOf(level)), true).flush();
-//            dispose();
-//            main.setScreen(new HeinousScreen(main, "tiger.tmx"));
         }
 
         stageDialogs.act();
@@ -387,32 +390,31 @@ public class HeinousScreen implements InputProcessor, Screen {
         //renderDebug();
     }
 
-    private void renderDebug() {
-        main.shapeRenderer.setProjectionMatrix(cameraGamePlay.combined);
-        main.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//    private void renderDebug() {
+//        main.shapeRenderer.setProjectionMatrix(cameraGamePlay.combined);
+//        main.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//
+//        main.shapeRenderer.setColor(Color.RED);
+//        main.shapeRenderer.rect(characterRect.x, characterRect.y, characterRect.width, characterRect.height);
+//
+//        getTiles(0, 0, worldWidth, worldHeight, tiles, rectPool);
+//        for (Rectangle tile : tiles) {
+//            main.shapeRenderer.rect(tile.x, tile.y, tile.width, tile.height);
+//        }
+//
+//        for (int i = 0; i < currentCheckpointIndex; i++) {
+//            float checkPoint1X = (checkPoints.get(i).getX() + checkPoints.get(i).getX() + checkPoints.get(i).getWidth())/2f ;
+//            float checkPoint1Y = (checkPoints.get(i).getY() + checkPoints.get(i).getY() + checkPoints.get(i).getHeight())/2f;
+//            float checkPoint2X = (checkPoints.get(i+1).getX() + checkPoints.get(i+1).getX() + checkPoints.get(i+1).getWidth())/2f ;
+//            float checkPoint2Y = (checkPoints.get(i+1).getY() + checkPoints.get(i+1).getY() + checkPoints.get(i+1).getHeight())/2f;
+//
+//            main.shapeRenderer.line(checkPoint1X, checkPoint1Y, checkPoint2X, checkPoint2Y);
+//        }
+//
+//        main.shapeRenderer.end();
+//    }
 
-        main.shapeRenderer.setColor(Color.RED);
-        main.shapeRenderer.rect(characterRect.x, characterRect.y, characterRect.width, characterRect.height);
-
-        getTiles(0, 0, worldWidth, worldHeight, tiles, "walls", rectPool);
-        for (Rectangle tile : tiles) {
-            main.shapeRenderer.rect(tile.x, tile.y, tile.width, tile.height);
-        }
-
-        for (int i = 0; i < currentCheckpointIndex; i++) {
-            float checkPoint1X = (checkPoints.get(i).getX() + checkPoints.get(i).getX() + checkPoints.get(i).getWidth())/2f ;
-            float checkPoint1Y = (checkPoints.get(i).getY() + checkPoints.get(i).getY() + checkPoints.get(i).getHeight())/2f;
-            float checkPoint2X = (checkPoints.get(i+1).getX() + checkPoints.get(i+1).getX() + checkPoints.get(i+1).getWidth())/2f ;
-            float checkPoint2Y = (checkPoints.get(i+1).getY() + checkPoints.get(i+1).getY() + checkPoints.get(i+1).getHeight())/2f;
-
-            main.shapeRenderer.line(checkPoint1X, checkPoint1Y, checkPoint2X, checkPoint2Y);
-        }
-
-        main.shapeRenderer.end();
-    }
-
-/****** Original proof of concept - changes the index to whatever the last checkPoint you collide with, regardless of your most recent checkPoint
- *
+/* Original proof of concept - changes the index to whatever the last checkPoint you collide with, regardless of your most recent checkPoint
     public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
         for (int i = 0; i < checkpoints.size; i++) {
             float originX = (rect.x + rect.width + rect.x)/2f;
@@ -427,10 +429,9 @@ public class HeinousScreen implements InputProcessor, Screen {
             }
         }
     }
-
 */
 
-/*** Game mode/Option one, Must be sequential **
+/* Game mode/Option one, Must be sequential *
 
     public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints) {
 
@@ -481,7 +482,7 @@ public class HeinousScreen implements InputProcessor, Screen {
     }
 
 
-    /*** Game mode/Option two, doesn't need to be sequential **
+    /* Game mode/Option two, doesn't need to be sequential *
 
     public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
 
@@ -549,14 +550,14 @@ public class HeinousScreen implements InputProcessor, Screen {
         }
     }
 */
-    /*** Game mode/Option two, doesn't need to be sequential Now with path meeting technology**/
+    /* Game mode/Option two, doesn't need to be sequential Now with path meeting technology*/
 
-    public void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
+    private void checkCheckPoints(Rectangle rect, Array<CheckPoint> checkpoints){
 
         float originX = (rect.x + rect.width + rect.x)/2f;
         float originY = (rect.y + rect.height + rect.y)/2f;
-        int lastIndex = (currentCheckpointIndex == 0) ? checkpoints.size - 1  : currentCheckpointIndex - 1;
-        int nextIndex = (currentCheckpointIndex == checkpoints.size -1) ? 0 : currentCheckpointIndex + 1;
+//        int lastIndex = (currentCheckpointIndex == 0) ? checkpoints.size - 1  : currentCheckpointIndex - 1;
+//        int nextIndex = (currentCheckpointIndex == checkpoints.size -1) ? 0 : currentCheckpointIndex + 1;
 /*
             float distance = distance(checkpoints.get(lastIndex).originVec, new Vector2(originX, originY));
             if (distance <= PATH_BUFFER_DISTANCE && !checkpoints.get(lastIndex).connectedHigher) {
@@ -602,17 +603,15 @@ public class HeinousScreen implements InputProcessor, Screen {
     }
 
 
-    public float distance(Vector2 point1, Vector2 point2){
+    private float distance(Vector2 point1, Vector2 point2){
         return (float)Math.sqrt(Math.pow(point2.x - point1.x,2) + Math.pow(point2.y - point1.y,2));
     }
 
-    public float distance(float x1, float y1, float x2, float y2){
+    private float distance(float x1, float y1, float x2, float y2){
         return (float)Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2- y1,2));
     }
 
-
-
-    public void addToPaths(Rectangle characterRect, Array<CheckPoint> checkPoints){
+    private void addToPaths(Rectangle characterRect, Array<CheckPoint> checkPoints){
 
         float originX = (characterRect.x + characterRect.width + characterRect.x)/2f;
         float originY = (characterRect.y + characterRect.height + characterRect.y)/2f;
@@ -707,7 +706,7 @@ public class HeinousScreen implements InputProcessor, Screen {
 
     @Override
     public void hide() {
-//        main.bgMusic.pause();
+
     }
 
     @Override
@@ -758,13 +757,6 @@ public class HeinousScreen implements InputProcessor, Screen {
             goingUp = false;
         }
 
-        if (keycode == Input.Keys.SPACE) {
-            /*
-            holdingSpace = false;
-            win = false;
-            bgAlpha = 0;
-            */
-        }
         return false;
     }
 
@@ -798,12 +790,11 @@ public class HeinousScreen implements InputProcessor, Screen {
         return false;
     }
 
-    public void getTiles(int startX, int startY, int endX, int endY, Array<Rectangle> tiles,
-                         String layerName, Pool<Rectangle> rectPool) {
+    private void getTiles(int startX, int startY, int endX, int endY, Array<Rectangle> tiles, Pool<Rectangle> rectPool) {
         rectPool.freeAll(tiles);
         tiles.clear();
-        if (map.getLayers().get(layerName) != null) {
-            TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(layerName);
+        if (map.getLayers().get("walls") != null) {
+            TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("walls");
             for (int y = startY; y <= endY; y++) {
                 for (int x = startX; x <= endX; x++) {
                     TiledMapTileLayer.Cell cell = layer.getCell(x, y);
